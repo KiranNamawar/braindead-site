@@ -1,5 +1,5 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="80" fill="url(#gradient)"/>
+  <rect width="512" height="512" rx="64" fill="url(#gradient)"/>
   <defs>
     <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#3b82f6"/>
@@ -7,26 +7,34 @@
     </linearGradient>
   </defs>
   
-  <!-- Simple brain icon -->
-  <path d="M256 96C296 96 328 120 344 152C360 184 360 224 360 256C360 288 360 328 344 360C328 392 296 416 256 416C216 416 184 392 168 360C152 328 152 288 152 256C152 224 152 184 168 152C184 120 216 96 256 96Z" fill="white" opacity="0.9"/>
+  <!-- Brain shape -->
+  <path d="M256 80C320 80 372 132 372 196C372 228 364 258 350 284C362 298 368 316 368 336C368 392 324 436 268 436H244C188 436 144 392 144 336C144 316 150 298 162 284C148 258 140 228 140 196C140 132 192 80 256 80Z" fill="white" opacity="0.95"/>
   
-  <!-- Simple neural network -->
-  <circle cx="208" cy="208" r="16" fill="white" opacity="0.8"/>
-  <circle cx="304" cy="208" r="16" fill="white" opacity="0.8"/>
-  <circle cx="256" cy="256" r="16" fill="white" opacity="0.8"/>
-  <circle cx="208" cy="304" r="16" fill="white" opacity="0.8"/>
-  <circle cx="304" cy="304" r="16" fill="white" opacity="0.8"/>
+  <!-- Brain division -->
+  <path d="M256 80C256 160 256 320 256 436" stroke="#3b82f6" stroke-width="6" opacity="0.3"/>
   
-  <!-- Connection lines -->
-  <line x1="208" y1="208" x2="256" y2="256" stroke="white" stroke-width="4" opacity="0.6"/>
-  <line x1="304" y1="208" x2="256" y2="256" stroke="white" stroke-width="4" opacity="0.6"/>
-  <line x1="256" y1="256" x2="208" y2="304" stroke="white" stroke-width="4" opacity="0.6"/>
-  <line x1="256" y1="256" x2="304" y2="304" stroke="white" stroke-width="4" opacity="0.6"/>
+  <!-- X Eyes (Dead brain) -->
+  <g stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.9">
+    <!-- Left X eye -->
+    <line x1="200" y1="180" x2="230" y2="210"/>
+    <line x1="230" y1="180" x2="200" y2="210"/>
+    
+    <!-- Right X eye -->
+    <line x1="282" y1="180" x2="312" y2="210"/>
+    <line x1="312" y1="180" x2="282" y2="210"/>
+  </g>
   
-  <!-- Additional neural connections -->
-  <line x1="208" y1="208" x2="304" y2="208" stroke="white" stroke-width="3" opacity="0.4"/>
-  <line x1="208" y1="304" x2="304" y2="304" stroke="white" stroke-width="3" opacity="0.4"/>
+  <!-- Sleepy mouth -->
+  <path d="M220 280C240 300 272 300 292 280" stroke="white" stroke-width="12" stroke-linecap="round" fill="none" opacity="0.8"/>
+  
+  <!-- Brain texture lines -->
+  <g stroke="#3b82f6" stroke-width="4" opacity="0.2">
+    <path d="M160 240C172 228 184 240 196 228"/>
+    <path d="M316 228C328 240 340 228 352 240"/>
+    <path d="M172 320C184 308 196 320 208 308"/>
+    <path d="M304 308C316 320 328 308 340 320"/>
+  </g>
   
   <!-- Brand text -->
-  <text x="256" y="450" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="48" font-weight="700">BrainDead</text>
+  <text x="256" y="470" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="28" font-weight="700" opacity="0.9">BrainDead.site</text>
 </svg>

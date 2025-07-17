@@ -7,13 +7,31 @@
     </linearGradient>
   </defs>
   
-  <!-- Simple brain icon -->
-  <path d="M16 6C18.5 6 20.5 7.5 21.5 9.5C22.5 11.5 22.5 14 22.5 16C22.5 18 22.5 20.5 21.5 22.5C20.5 24.5 18.5 26 16 26C13.5 26 11.5 24.5 10.5 22.5C9.5 20.5 9.5 18 9.5 16C9.5 14 9.5 11.5 10.5 9.5C11.5 7.5 13.5 6 16 6Z" fill="white" opacity="0.9"/>
+  <!-- Brain shape -->
+  <path d="M16 5C20.5 5 24 8.5 24 13C24 15 23.5 16.8 22.5 18.2C23.2 19.1 23.5 20.2 23.5 21.5C23.5 24.5 21 27 18 27H14C11 27 8.5 24.5 8.5 21.5C8.5 20.2 8.8 19.1 9.5 18.2C8.5 16.8 8 15 8 13C8 8.5 11.5 5 16 5Z" fill="white" opacity="0.95"/>
   
-  <!-- Simple neural dots -->
-  <circle cx="13" cy="13" r="1" fill="white" opacity="0.8"/>
-  <circle cx="19" cy="13" r="1" fill="white" opacity="0.8"/>
-  <circle cx="16" cy="16" r="1" fill="white" opacity="0.8"/>
-  <circle cx="13" cy="19" r="1" fill="white" opacity="0.8"/>
-  <circle cx="19" cy="19" r="1" fill="white" opacity="0.8"/>
+  <!-- Brain division line -->
+  <path d="M16 5C16 8 16 15 16 27" stroke="#3b82f6" stroke-width="0.5" opacity="0.3"/>
+  
+  <!-- X Eyes (Dead brain) -->
+  <g stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.9">
+    <!-- Left X eye -->
+    <line x1="12" y1="11" x2="14" y2="13"/>
+    <line x1="14" y1="11" x2="12" y2="13"/>
+    
+    <!-- Right X eye -->
+    <line x1="18" y1="11" x2="20" y2="13"/>
+    <line x1="20" y1="11" x2="18" y2="13"/>
+  </g>
+  
+  <!-- Sleepy mouth -->
+  <path d="M14 18C15 19 17 19 18 18" stroke="white" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.8"/>
+  
+  <!-- Brain texture lines -->
+  <g stroke="#3b82f6" stroke-width="0.3" opacity="0.2">
+    <path d="M10 15C11 14 12 15 13 14"/>
+    <path d="M19 14C20 15 21 14 22 15"/>
+    <path d="M11 20C12 19 13 20 14 19"/>
+    <path d="M18 19C19 20 20 19 21 20"/>
+  </g>
 </svg>

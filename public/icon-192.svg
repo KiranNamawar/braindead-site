@@ -7,22 +7,34 @@
     </linearGradient>
   </defs>
   
-  <!-- Simple brain icon -->
-  <path d="M96 36C111 36 123 45 129 57C135 69 135 84 135 96C135 108 135 123 129 135C123 147 111 156 96 156C81 156 69 147 63 135C57 123 57 108 57 96C57 84 57 69 63 57C69 45 81 36 96 36Z" fill="white" opacity="0.9"/>
+  <!-- Brain shape -->
+  <path d="M96 30C122 30 144 52 144 78C144 90 140 101 134 110C139 116 142 124 142 132C142 150 128 164 110 164H82C64 164 50 150 50 132C50 124 53 116 58 110C52 101 48 90 48 78C48 52 70 30 96 30Z" fill="white" opacity="0.95"/>
   
-  <!-- Simple neural network -->
-  <circle cx="78" cy="78" r="6" fill="white" opacity="0.8"/>
-  <circle cx="114" cy="78" r="6" fill="white" opacity="0.8"/>
-  <circle cx="96" cy="96" r="6" fill="white" opacity="0.8"/>
-  <circle cx="78" cy="114" r="6" fill="white" opacity="0.8"/>
-  <circle cx="114" cy="114" r="6" fill="white" opacity="0.8"/>
+  <!-- Brain division line -->
+  <path d="M96 30C96 60 96 120 96 164" stroke="#3b82f6" stroke-width="3" opacity="0.3"/>
   
-  <!-- Connection lines -->
-  <line x1="78" y1="78" x2="96" y2="96" stroke="white" stroke-width="2" opacity="0.6"/>
-  <line x1="114" y1="78" x2="96" y2="96" stroke="white" stroke-width="2" opacity="0.6"/>
-  <line x1="96" y1="96" x2="78" y2="114" stroke="white" stroke-width="2" opacity="0.6"/>
-  <line x1="96" y1="96" x2="114" y2="114" stroke="white" stroke-width="2" opacity="0.6"/>
+  <!-- X Eyes (Dead brain) -->
+  <g stroke="white" stroke-width="8" stroke-linecap="round" opacity="0.9">
+    <!-- Left X eye -->
+    <line x1="72" y1="66" x2="84" y2="78"/>
+    <line x1="84" y1="66" x2="72" y2="78"/>
+    
+    <!-- Right X eye -->
+    <line x1="108" y1="66" x2="120" y2="78"/>
+    <line x1="120" y1="66" x2="108" y2="78"/>
+  </g>
+  
+  <!-- Sleepy mouth -->
+  <path d="M84 108C90 114 102 114 108 108" stroke="white" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.8"/>
+  
+  <!-- Brain texture lines -->
+  <g stroke="#3b82f6" stroke-width="2" opacity="0.2">
+    <path d="M60 90C66 84 72 90 78 84"/>
+    <path d="M114 84C120 90 126 84 132 90"/>
+    <path d="M66 120C72 114 78 120 84 114"/>
+    <path d="M108 114C114 120 120 114 126 120"/>
+  </g>
   
   <!-- Brand text -->
-  <text x="96" y="170" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="20" font-weight="700">BD</text>
+  <text x="96" y="175" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="16" font-weight="700" opacity="0.9">BrainDead</text>
 </svg>

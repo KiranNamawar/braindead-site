@@ -5,6 +5,8 @@ import { trackPageView } from './utils/analytics';
 import { info } from './utils/logger';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './components/ToastContainer';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
+import OfflineIndicator from './components/OfflineIndicator';
 import HomePage from './pages/HomePage';
 import CalculatorPage from './pages/CalculatorPage';
 import ColorPickerPage from './pages/ColorPickerPage';
@@ -64,6 +66,9 @@ function App() {
                 <Route path="/unit-converter" element={<UnitConverterPage />} />
               </Routes>
             </Layout>
+            {/* PWA Components */}
+            <OfflineIndicator />
+            <PWAInstallPrompt />
           </Router>
         </ToastProvider>
       </HelmetProvider>
