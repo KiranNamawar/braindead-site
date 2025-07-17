@@ -324,7 +324,21 @@ class StorageManager {
 
   // Analytics Management
   public getAnalytics(): UsageAnalytics {
-    return this.getItem(this.storageKeys.analytics, this.defaultAnalytics)!;
+    const analytics = this.getItem(this.storageKeys.analytics, this.defaultAnalytics)!;
+    
+    // Ensure all categories are present (for backward compatibility)
+    if (!analytics.toolCategoryUsage) {
+      analytics.toolCategoryUsage = { ...this.defaultAnalytics.toolCategoryUsage };
+    } else {
+      // Fill in any missing categories
+      Object.keys(this.defaultAnalytics.toolCategoryUsage).forEach(category => {
+        if (analytics.toolCategoryUsage[category as ToolCategory] === undefined) {
+          analytics.toolCategoryUsage[category as ToolCategory] = 0;
+        }
+      });
+    }
+    
+    return analytics;
   }
 
   public setAnalytics(analytics: UsageAnalytics): void {
@@ -340,10 +354,12 @@ class StorageManager {
     
     // Update most used tool
     const recentTools = this.getRecentTools();
-    const mostUsed = recentTools.reduce((prev, current) => 
-      prev.usageCount > current.usageCount ? prev : current
-    );
-    analytics.mostUsedTool = mostUsed.toolId;
+    if (recentTools.length > 0) {
+      const mostUsed = recentTools.reduce((prev, current) => 
+        prev.usageCount > current.usageCount ? prev : current
+      );
+      analytics.mostUsedTool = mostUsed.toolId;
+    }
     
     // Calculate productivity score (simple algorithm)
     analytics.productivityScore = Math.min(100, 

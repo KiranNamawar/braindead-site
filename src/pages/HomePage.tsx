@@ -20,6 +20,10 @@ import {
 } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import SearchModal from '../components/SearchModal';
+import FavoritesSection from '../components/FavoritesSection';
+import FavoriteButton from '../components/FavoriteButton';
+import RecentToolsSection from '../components/RecentToolsSection';
+import AnalyticsDashboard from '../components/AnalyticsDashboard';
 import { useSearchModal } from '../hooks/useSearchModal';
 
 const HomePage: React.FC = () => {
@@ -240,6 +244,27 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Favorites Section */}
+      <section className="relative py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <FavoritesSection />
+        </div>
+      </section>
+
+      {/* Recent Tools Section */}
+      <section className="relative py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <RecentToolsSection />
+        </div>
+      </section>
+
+      {/* Analytics Dashboard */}
+      <section className="relative py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <AnalyticsDashboard />
+        </div>
+      </section>
+
       {/* Tools Grid */}
       <section className="relative py-20 px-6">
         <div className="max-w-7xl mx-auto">
@@ -260,6 +285,11 @@ const HomePage: React.FC = () => {
                 className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8 hover:border-gray-700 transition-all duration-500 hover:scale-105 animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
+                {/* Favorite Button */}
+                <div className="absolute top-4 right-4">
+                  <FavoriteButton toolId={tool.id} size="md" />
+                </div>
+
                 <div className="mb-6">
                   <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${tool.gradient} rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
                     <tool.icon className="w-8 h-8 text-white" />
