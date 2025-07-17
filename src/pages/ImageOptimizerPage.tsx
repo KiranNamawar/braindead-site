@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Image as ImageIcon, Download, Upload, Zap, FileImage, Trash2, Info } from 'lucide-react';
+import { Image as ImageIcon, Download, Upload, Zap, FileImage, Info } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import { useToast } from '../components/ToastContainer';
 import SEOHead from '../components/SEOHead';
@@ -18,7 +18,6 @@ const ImageOptimizerPage: React.FC = () => {
   const [compressionLevel, setCompressionLevel] = useState('balanced');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const workerRef = useRef<Worker | null>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Zap, ArrowRightLeft, Calculator } from 'lucide-react';
 import BackButton from '../components/BackButton';
-import { useToast } from '../components/ToastContainer';
+
 import SEOHead from '../components/SEOHead';
 
 interface ConversionUnit {

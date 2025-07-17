@@ -5,7 +5,7 @@ import { useToast } from '../components/ToastContainer';
 import SEOHead from '../components/SEOHead';
 
 const RandomGeneratorPage: React.FC = () => {
-  const { showSuccess, showError } = useToast();
+  const { showError } = useToast();
   const [activeTab, setActiveTab] = useState('numbers');
   const [copyFeedback, setCopyFeedback] = useState('');
   const [generationHistory, setGenerationHistory] = useState<Array<{type: string, value: string, timestamp: string}>>([]);

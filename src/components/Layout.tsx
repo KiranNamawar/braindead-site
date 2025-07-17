@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import SimpleFooter from './SimpleFooter';
 
 interface LayoutProps {
@@ -8,7 +7,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const location = useLocation();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {

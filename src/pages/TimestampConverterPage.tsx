@@ -5,7 +5,7 @@ import { useToast } from '../components/ToastContainer';
 import SEOHead from '../components/SEOHead';
 
 const TimestampConverterPage: React.FC = () => {
-  const { showSuccess, showError } = useToast();
+  const { showError } = useToast();
   const [timestamp, setTimestamp] = useState('');
   const [humanDate, setHumanDate] = useState('');
   const [timezone, setTimezone] = useState('UTC');

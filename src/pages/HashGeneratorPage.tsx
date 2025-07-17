@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Hash, Copy, FileText, Upload, AlertTriangle } from 'lucide-react';
+import { Hash, Copy, FileText, AlertTriangle } from 'lucide-react';
 import CryptoJS from 'crypto-js';
 import BackButton from '../components/BackButton';
 import { useToast } from '../components/ToastContainer';

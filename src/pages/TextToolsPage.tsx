@@ -11,7 +11,7 @@ const TextToolsPage: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [activeTab, setActiveTab] = useState('transform');
-  const { copyToClipboard, isCopied } = useClipboard();
+  const { copyToClipboard } = useClipboard();
   const { showSuccess, showError } = useToast();
 
   const handleCopy = async (text: string) => {
@@ -60,20 +60,23 @@ const TextToolsPage: React.FC = () => {
       case 'sortLines':
         result = inputText.split('\n').sort().join('\n');
         break;
-      case 'removeDuplicateLines':
+      case 'removeDuplicateLines': {
         const lines = inputText.split('\n');
         result = [...new Set(lines)].join('\n');
         break;
-      case 'extractEmails':
+      }
+      case 'extractEmails': {
         const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
         const emails = sanitizeInput(inputText).match(emailRegex) || [];
         result = emails.join('\n');
         break;
-      case 'extractUrls':
-        const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
+      }
+      case 'extractUrls': {
+        const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
         const urls = sanitizeInput(inputText).match(urlRegex) || [];
         result = urls.join('\n');
         break;
+      }
       default:
         result = inputText;
     }

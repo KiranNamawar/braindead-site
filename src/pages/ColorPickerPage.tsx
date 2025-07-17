@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { Palette, Copy, Download, RefreshCw, Eye, Pipette } from 'lucide-react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useClipboard } from '../hooks/useClipboard';
@@ -12,7 +12,7 @@ const ColorPickerPage: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState('#3B82F6');
   const [colorHistory, setColorHistory] = useLocalStorage<string[]>(STORAGE_KEYS.colorHistory, ['#3B82F6']);
   const [palette, setPalette] = useState<string[]>([]);
-  const { copyToClipboard, isCopied } = useClipboard();
+  const { copyToClipboard } = useClipboard();
   const { showSuccess, showError } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,11 +85,11 @@ const ColorPickerPage: React.FC = () => {
   };
 
   const hslToHex = (h: number, s: number, l: number) => {
-    l /= 100;
-    const a = s * Math.min(l, 1 - l) / 100;
+    const lightness = l / 100;
+    const a = s * Math.min(lightness, 1 - lightness) / 100;
     const f = (n: number) => {
       const k = (n + h / 30) % 12;
-      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      const color = lightness - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
       return Math.round(255 * color).toString(16).padStart(2, '0');
     };
     return `#${f(0)}${f(8)}${f(4)}`;
@@ -98,13 +98,13 @@ const ColorPickerPage: React.FC = () => {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    
+
     if (file.size > APP_CONFIG.maxFileSize) {
       showError('File too large', 'Please select a file smaller than 10MB');
       return;
     }
-    
-    if (!APP_CONFIG.supportedImageTypes.includes(file.type)) {
+
+    if (!APP_CONFIG.supportedImageTypes.includes(file.type as any)) {
       showError('Unsupported file type', 'Please select a JPEG, PNG, WebP, or GIF image');
       return;
     }
@@ -153,12 +153,12 @@ const ColorPickerPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <BackButton />
-      <SEOHead 
+      <SEOHead
         title="Color Picker"
         description="Extract colors from images, generate palettes, and convert between color formats. Perfect for designers and developers."
         canonical="/color-picker"
       />
-      
+
       {/* Header */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-500 to-red-600 rounded-2xl mb-6">
@@ -168,7 +168,7 @@ const ColorPickerPage: React.FC = () => {
           Color Picker
         </h1>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-          Extract colors from images, generate palettes, and convert between formats. 
+          Extract colors from images, generate palettes, and convert between formats.
           <span className="text-pink-400"> Because naming colors is hard!</span>
         </p>
       </div>
@@ -179,9 +179,9 @@ const ColorPickerPage: React.FC = () => {
           {/* Color Input */}
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8">
             <h3 className="text-xl font-bold text-white mb-6">Color Selector</h3>
-            
+
             <div className="flex items-center space-x-4 mb-6">
-              <div 
+              <div
                 className="w-20 h-20 rounded-2xl border-4 border-gray-700 shadow-lg"
                 style={{ backgroundColor: selectedColor }}
               ></div>
@@ -231,7 +231,7 @@ const ColorPickerPage: React.FC = () => {
               <Pipette className="w-5 h-5 mr-2" />
               Extract from Image
             </h3>
-            
+
             <div className="mb-4">
               <input
                 ref={fileInputRef}
@@ -288,7 +288,7 @@ const ColorPickerPage: React.FC = () => {
           {/* Color Formats */}
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-6">
             <h3 className="text-xl font-bold text-white mb-4">Color Formats</h3>
-            
+
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
                 <div>
