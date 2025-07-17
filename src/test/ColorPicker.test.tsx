@@ -1,12 +1,18 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { ToastProvider } from '../components/ToastContainer';
 import ColorPickerPage from '../pages/ColorPickerPage';
 
 const renderColorPicker = () => {
   return render(
-    <BrowserRouter>
-      <ColorPickerPage />
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <ToastProvider>
+          <ColorPickerPage />
+        </ToastProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 };
 

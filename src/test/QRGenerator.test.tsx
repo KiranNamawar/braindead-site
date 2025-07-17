@@ -1,12 +1,18 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { ToastProvider } from '../components/ToastContainer';
 import QRGeneratorPage from '../pages/QRGeneratorPage';
 
 const renderQRGenerator = () => {
   return render(
-    <BrowserRouter>
-      <QRGeneratorPage />
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <ToastProvider>
+          <QRGeneratorPage />
+        </ToastProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 };
 

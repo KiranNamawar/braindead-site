@@ -292,36 +292,55 @@
     - Create shareable countdown links (local storage based)
     - _Requirements: 2.1, 2.3, 5.1_
 
-- [ ] 8. Build developer tools category
-  - [ ] 8.1 Create Base64 Encoder/Decoder tool
+- [x] 8. Build developer tools category
+
+
+
+
+
+
+
+
+
+  - [x] 8.1 Create Base64 Encoder/Decoder tool
+
+
     - Build bidirectional Base64 encoding/decoding
     - Implement file upload for Base64 conversion
     - Add URL-safe Base64 variant support
     - Create batch processing functionality
     - _Requirements: 2.1, 2.3, 4.1_
   
-  - [ ] 8.2 Create URL Encoder/Decoder tool
+  - [x] 8.2 Create URL Encoder/Decoder tool
+
+
     - Implement URL encoding and decoding functionality
     - Build component-wise URL parsing
     - Add query parameter extraction and formatting
     - Create URL validation and analysis
     - _Requirements: 2.1, 2.3, 4.1_
   
-  - [ ] 8.3 Create Markdown Editor and Preview tool
+  - [x] 8.3 Create Markdown Editor and Preview tool
+
+
     - Build live markdown editor with syntax highlighting
     - Implement real-time preview functionality
     - Add markdown toolbar with common formatting options
     - Create export functionality (HTML, PDF)
     - _Requirements: 2.1, 2.3, 4.1_
   
-  - [ ] 8.4 Create UUID Generator tool
+  - [x] 8.4 Create UUID Generator tool
+
+
     - Implement multiple UUID version generation (v1, v4, v5)
     - Build bulk UUID generation
     - Add UUID validation functionality
     - Create different output formats
     - _Requirements: 2.1, 2.3, 4.1_
   
-  - [ ] 8.5 Create JWT Decoder tool
+  - [x] 8.5 Create JWT Decoder tool
+
+
     - Build JWT token parsing and decoding
     - Implement header and payload display
     - Add signature verification information

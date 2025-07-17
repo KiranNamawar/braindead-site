@@ -37,6 +37,11 @@ import PomodoroTimerPage from './pages/PomodoroTimerPage';
 import WorldClockPage from './pages/WorldClockPage';
 import StopwatchTimerPage from './pages/StopwatchTimerPage';
 import CountdownTimerPage from './pages/CountdownTimerPage';
+import Base64EncoderPage from './pages/Base64EncoderPage';
+import URLEncoderPage from './pages/URLEncoderPage';
+import MarkdownEditorPage from './pages/MarkdownEditorPage';
+import UUIDGeneratorPage from './pages/UUIDGeneratorPage';
+import JWTDecoderPage from './pages/JWTDecoderPage';
 import Layout from './components/Layout';
 import SEOHead from './components/SEOHead';
 
@@ -100,6 +105,11 @@ function App() {
                 <Route path="/world-clock" element={<WorldClockPage />} />
                 <Route path="/stopwatch-timer" element={<StopwatchTimerPage />} />
                 <Route path="/countdown-timer" element={<CountdownTimerPage />} />
+                <Route path="/base64-encoder" element={<Base64EncoderPage />} />
+                <Route path="/url-encoder" element={<URLEncoderPage />} />
+                <Route path="/markdown-editor" element={<MarkdownEditorPage />} />
+                <Route path="/uuid-generator" element={<UUIDGeneratorPage />} />
+                <Route path="/jwt-decoder" element={<JWTDecoderPage />} />
               </Routes>
             </Layout>
             {/* PWA Components */}
