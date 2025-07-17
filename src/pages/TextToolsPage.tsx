@@ -182,7 +182,10 @@ const TextToolsPage: React.FC = () => {
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8">
             <h3 className="text-xl font-bold text-white mb-6">Input Text</h3>
             <textarea
-              className="w-full h-80 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white resize-none focus:border-amber-500 focus:outline-none"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Enter your text here..."
+              className="w-full h-64 md:h-80 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white resize-none focus:border-amber-500 focus:outline-none text-sm md:text-base"
             />
             <div className="flex justify-between items-center mt-4 text-sm text-gray-400">
               <span>{inputText.length} characters</span>
@@ -225,7 +228,7 @@ const TextToolsPage: React.FC = () => {
                 value={outputText}
                 readOnly
                 placeholder="Transformed text will appear here..."
-                className="w-full h-80 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white resize-none focus:border-amber-500 focus:outline-none"
+                className="w-full h-64 md:h-80 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white resize-none focus:border-amber-500 focus:outline-none text-sm md:text-base"
               />
               <div className="flex justify-between items-center mt-4">
                 <span className="text-sm text-gray-400">{outputText.length} characters</span>

@@ -161,32 +161,37 @@ const PasswordGeneratorPage: React.FC = () => {
             </div>
             
             <div className="relative mb-6">
-              <div className="flex items-center space-x-3">
-                <div className="flex-1 relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    readOnly
-                    className="w-full px-4 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white font-mono text-lg focus:border-purple-500 focus:outline-none pr-12"
-                  />
-                  <button
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-700 rounded transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
-                  </button>
-                </div>
+              {/* Password Display - Full Width */}
+              <div className="relative mb-4">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  readOnly
+                  className="w-full px-4 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white font-mono text-sm md:text-lg focus:border-purple-500 focus:outline-none pr-12"
+                />
+                <button
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-700 rounded transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
+                </button>
+              </div>
+              
+              {/* Action Buttons - Full Width on Mobile */}
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => handleCopy(password)}
-                  className="p-4 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl text-purple-400 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl text-purple-400 transition-colors"
                 >
                   <Copy className="w-5 h-5" />
+                  <span className="font-medium">{isCopied ? 'Copied!' : 'Copy Password'}</span>
                 </button>
                 <button
                   onClick={generatePassword}
-                  className="p-4 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl text-white hover:from-purple-400 hover:to-indigo-500 transition-all duration-300"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl text-white hover:from-purple-400 hover:to-indigo-500 transition-all duration-300"
                 >
                   <RefreshCw className="w-5 h-5" />
+                  <span className="font-medium">Generate New</span>
                 </button>
               </div>
             </div>
