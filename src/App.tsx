@@ -25,6 +25,11 @@ import BMICalculatorPage from './pages/BMICalculatorPage';
 import LoanCalculatorPage from './pages/LoanCalculatorPage';
 import PercentageCalculatorPage from './pages/PercentageCalculatorPage';
 import GradeCalculatorPage from './pages/GradeCalculatorPage';
+import WordCounterPage from './pages/WordCounterPage';
+import TextCaseConverterPage from './pages/TextCaseConverterPage';
+import LoremIpsumPage from './pages/LoremIpsumPage';
+import DiffCheckerPage from './pages/DiffCheckerPage';
+import TextSummarizerPage from './pages/TextSummarizerPage';
 import Layout from './components/Layout';
 import SEOHead from './components/SEOHead';
 
@@ -76,6 +81,11 @@ function App() {
                 <Route path="/loan-calculator" element={<LoanCalculatorPage />} />
                 <Route path="/percentage-calculator" element={<PercentageCalculatorPage />} />
                 <Route path="/grade-calculator" element={<GradeCalculatorPage />} />
+                <Route path="/word-counter" element={<WordCounterPage />} />
+                <Route path="/text-case-converter" element={<TextCaseConverterPage />} />
+                <Route path="/lorem-ipsum" element={<LoremIpsumPage />} />
+                <Route path="/diff-checker" element={<DiffCheckerPage />} />
+                <Route path="/text-summarizer" element={<TextSummarizerPage />} />
               </Routes>
             </Layout>
             {/* PWA Components */}
