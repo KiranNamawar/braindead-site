@@ -33,6 +33,10 @@ import TextSummarizerPage from './pages/TextSummarizerPage';
 import GradientGeneratorPage from './pages/GradientGeneratorPage';
 import ASCIIArtGeneratorPage from './pages/ASCIIArtGeneratorPage';
 import FaviconGeneratorPage from './pages/FaviconGeneratorPage';
+import PomodoroTimerPage from './pages/PomodoroTimerPage';
+import WorldClockPage from './pages/WorldClockPage';
+import StopwatchTimerPage from './pages/StopwatchTimerPage';
+import CountdownTimerPage from './pages/CountdownTimerPage';
 import Layout from './components/Layout';
 import SEOHead from './components/SEOHead';
 
@@ -92,6 +96,10 @@ function App() {
                 <Route path="/gradient-generator" element={<GradientGeneratorPage />} />
                 <Route path="/ascii-art-generator" element={<ASCIIArtGeneratorPage />} />
                 <Route path="/favicon-generator" element={<FaviconGeneratorPage />} />
+                <Route path="/pomodoro-timer" element={<PomodoroTimerPage />} />
+                <Route path="/world-clock" element={<WorldClockPage />} />
+                <Route path="/stopwatch-timer" element={<StopwatchTimerPage />} />
+                <Route path="/countdown-timer" element={<CountdownTimerPage />} />
               </Routes>
             </Layout>
             {/* PWA Components */}

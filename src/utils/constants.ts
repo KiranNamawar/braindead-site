@@ -37,6 +37,16 @@ export const STORAGE_KEYS = {
   searchHistory: 'braindead-search-history',
   sharedClipboard: 'braindead-shared-clipboard',
   toolConfigs: 'braindead-tool-configs',
+  pomodoroSettings: 'pomodoro-settings',
+  pomodoroHistory: 'pomodoro-history',
+  pomodoroStats: 'pomodoro-stats',
+  worldClockTimezones: 'world-clock-timezones',
+  worldClockFormat: 'world-clock-format',
+  worldClockShowSeconds: 'world-clock-show-seconds',
+  stopwatchHistory: 'stopwatch-history',
+  timerHistory: 'timer-history',
+  timerSoundEnabled: 'timer-sound-enabled',
+  countdownEvents: 'countdown-events',
 } as const;
 
 export const ERROR_MESSAGES = {
