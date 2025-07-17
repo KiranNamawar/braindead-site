@@ -2,12 +2,17 @@
 export const APP_CONFIG = {
   name: 'BrainDead.site',
   description: 'Premium utility tools for effortless productivity',
-  version: '1.0.0',
+  version: '2.0.0',
   author: 'BrainDead.site Team',
   url: 'https://braindead.site',
   maxFileSize: 10 * 1024 * 1024, // 10MB
   supportedImageTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
   supportedTextTypes: ['text/plain', 'application/json', 'text/csv'],
+  maxToolsInRecent: 20,
+  maxFavorites: 50,
+  maxSearchHistory: 50,
+  searchDebounceMs: 300,
+  animationDuration: 200,
 } as const;
 
 export const STORAGE_KEYS = {
@@ -15,7 +20,14 @@ export const STORAGE_KEYS = {
   colorHistory: 'color-history',
   passwordHistory: 'password-history',
   qrHistory: 'qr-history',
-  userPreferences: 'user-preferences',
+  userPreferences: 'braindead-user-preferences',
+  toolUsage: 'braindead-tool-usage',
+  analytics: 'braindead-analytics',
+  favorites: 'braindead-favorites',
+  recentTools: 'braindead-recent-tools',
+  searchHistory: 'braindead-search-history',
+  sharedClipboard: 'braindead-shared-clipboard',
+  toolConfigs: 'braindead-tool-configs',
 } as const;
 
 export const ERROR_MESSAGES = {

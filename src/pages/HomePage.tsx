@@ -15,12 +15,16 @@ import {
   Image as ImageIcon, 
   Clock, 
   Code, 
-  Shuffle
+  Shuffle,
+  Search
 } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
+import SearchModal from '../components/SearchModal';
+import { useSearchModal } from '../hooks/useSearchModal';
 
 const HomePage: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { isOpen: isSearchOpen, openModal: openSearch, closeModal: closeSearch } = useSearchModal();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -207,6 +211,14 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-16">
+            <button
+              onClick={openSearch}
+              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl font-semibold text-white hover:from-purple-400 hover:to-pink-500 transition-all duration-300 hover:scale-105 flex items-center space-x-2"
+            >
+              <Search className="w-5 h-5" />
+              <span>Search Tools</span>
+              <kbd className="ml-2 px-2 py-1 bg-white/20 rounded text-xs">Ctrl+K</kbd>
+            </button>
             <button
               onClick={() => scrollToTool('calculator')}
               className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl font-semibold text-white hover:from-blue-400 hover:to-purple-500 transition-all duration-300 hover:scale-105 flex items-center space-x-2"
@@ -477,6 +489,9 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Search Modal */}
+      <SearchModal isOpen={isSearchOpen} onClose={closeSearch} />
     </div>
   );
 };
