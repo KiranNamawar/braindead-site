@@ -7,6 +7,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './components/ToastContainer';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
+import PWAUpdateNotification from './components/PWAUpdateNotification';
 import AccessibilityEnhancements from './components/shared/AccessibilityEnhancements';
 import HomePage from './pages/HomePage';
 import CalculatorPage from './pages/CalculatorPage';
@@ -121,6 +122,7 @@ function App() {
               {/* PWA Components */}
               <OfflineIndicator />
               <PWAInstallPrompt />
+              <PWAUpdateNotification />
             </Router>
           </AccessibilityEnhancements>
         </ToastProvider>
