@@ -5,8 +5,8 @@
   # Directory that contains the deploy-ready HTML files and assets
   publish = "dist"
   
-  # Default build command
-  command = "npm run build"
+  # Default build command - direct vite build
+  command = "npx vite build"
 
 # Let Netlify use its default Node.js version
 # [build.environment]
