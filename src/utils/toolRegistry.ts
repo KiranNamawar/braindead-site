@@ -348,6 +348,38 @@ class ToolRegistry {
         isPremium: false,
         estimatedTimeSaved: 5,
         isNew: true
+      },
+      {
+        id: 'number-converter',
+        name: 'Number Base Converter',
+        description: 'Convert numbers between binary, decimal, hexadecimal, and octal with step-by-step explanations',
+        sarcasticQuote: 'Convert numbers like a computer science student',
+        path: '/number-converter',
+        icon: 'Binary',
+        gradient: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+        category: ToolCategory.NUMBER_CONVERSION,
+        features: ['Multi-base conversion', 'Step-by-step explanation', 'Bitwise operations', 'Batch processing'],
+        keywords: ['binary', 'hex', 'decimal', 'octal', 'convert', 'base', 'number', 'bitwise'],
+        shortcuts: ['binary', 'hex', 'decimal', 'base'],
+        isPremium: false,
+        estimatedTimeSaved: 4,
+        isNew: true
+      },
+      {
+        id: 'roman-numeral',
+        name: 'Roman Numeral Converter',
+        description: 'Convert between Roman numerals and decimal numbers with historical context and validation',
+        sarcasticQuote: 'Because sometimes you need to feel ancient',
+        path: '/roman-numeral',
+        icon: 'Crown',
+        gradient: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+        category: ToolCategory.NUMBER_CONVERSION,
+        features: ['Bidirectional conversion', 'Format validation', 'Historical context', 'Batch processing'],
+        keywords: ['roman', 'numeral', 'convert', 'ancient', 'historical', 'latin'],
+        shortcuts: ['roman', 'numeral', 'ancient'],
+        isPremium: false,
+        estimatedTimeSaved: 3,
+        isNew: true
       }
     ];
 

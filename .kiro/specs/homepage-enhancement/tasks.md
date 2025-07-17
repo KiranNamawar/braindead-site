@@ -347,15 +347,29 @@
     - Create JWT structure explanation
     - _Requirements: 2.1, 2.3, 4.1_
 
-- [ ] 9. Build number and conversion tools category
-  - [ ] 9.1 Create Binary/Hex/Decimal Converter tool
+- [x] 9. Build number and conversion tools category
+
+
+
+
+
+
+
+
+
+
+  - [x] 9.1 Create Binary/Hex/Decimal Converter tool
+
+
     - Implement multi-base number conversion
     - Build step-by-step conversion explanation
     - Add bitwise operation visualization
     - Create batch conversion functionality
     - _Requirements: 2.1, 2.3, 4.1_
   
-  - [ ] 9.2 Create Roman Numeral Converter tool
+  - [x] 9.2 Create Roman Numeral Converter tool
+
+
     - Build bidirectional Roman numeral conversion
     - Implement validation for Roman numeral format
     - Add historical context and rules explanation

@@ -42,6 +42,8 @@ import URLEncoderPage from './pages/URLEncoderPage';
 import MarkdownEditorPage from './pages/MarkdownEditorPage';
 import UUIDGeneratorPage from './pages/UUIDGeneratorPage';
 import JWTDecoderPage from './pages/JWTDecoderPage';
+import NumberConverterPage from './pages/NumberConverterPage';
+import RomanNumeralPage from './pages/RomanNumeralPage';
 import Layout from './components/Layout';
 import SEOHead from './components/SEOHead';
 
@@ -110,6 +112,8 @@ function App() {
                 <Route path="/markdown-editor" element={<MarkdownEditorPage />} />
                 <Route path="/uuid-generator" element={<UUIDGeneratorPage />} />
                 <Route path="/jwt-decoder" element={<JWTDecoderPage />} />
+                <Route path="/number-converter" element={<NumberConverterPage />} />
+                <Route path="/roman-numeral" element={<RomanNumeralPage />} />
               </Routes>
             </Layout>
             {/* PWA Components */}
