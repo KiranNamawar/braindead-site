@@ -1,0 +1,13 @@
+# SPA fallback for React Router
+/*    /index.html   200
+
+# API redirects (if you add API endpoints later)
+/api/*  https://api.braindead.site/:splat  200
+
+# Redirect old URLs (if any)
+/tools/*  /:splat  301
+
+# Security redirects
+/admin/*  /  301
+/.env*  /  301
+/config/*  /  301
