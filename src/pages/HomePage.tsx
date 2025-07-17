@@ -15,8 +15,7 @@ import {
   Image as ImageIcon, 
   Clock, 
   Code, 
-  Shuffle,
-  Brain
+  Shuffle
 } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, Brain, Zap, Coffee } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -19,7 +19,13 @@ const SimpleFooter: React.FC = () => {
     "🚀 Productivity on autopilot"
   ];
 
-  const randomFact = funFacts[Math.floor(Math.random() * funFacts.length)];
+  // Use useState to make random values stable
+  const [randomFact] = useState(() => funFacts[Math.floor(Math.random() * funFacts.length)]);
+  const [stats] = useState(() => ({
+    brainCells: Math.floor(Math.random() * 1000) + 500,
+    calculations: Math.floor(Math.random() * 50) + 10,
+    passwords: Math.floor(Math.random() * 20) + 5
+  }));
 
   return (
     <footer className="relative bg-gray-950 border-t border-gray-800 py-8 md:py-12">
@@ -70,17 +76,17 @@ const SimpleFooter: React.FC = () => {
             <div className="space-y-2 text-sm">
               <div className="text-gray-400">
                 <span className="text-green-400 font-mono">
-                  {Math.floor(Math.random() * 1000) + 500}
+                  {stats.brainCells}
                 </span> brain cells saved
               </div>
               <div className="text-gray-400">
                 <span className="text-blue-400 font-mono">
-                  {Math.floor(Math.random() * 50) + 10}
+                  {stats.calculations}
                 </span> calculations done
               </div>
               <div className="text-gray-400">
                 <span className="text-purple-400 font-mono">
-                  {Math.floor(Math.random() * 20) + 5}
+                  {stats.passwords}
                 </span> passwords generated
               </div>
             </div>

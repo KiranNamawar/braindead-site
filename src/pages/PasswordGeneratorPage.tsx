@@ -18,7 +18,7 @@ const PasswordGeneratorPage: React.FC = () => {
   const [includeNumbers, setIncludeNumbers] = useState(true);
   const [includeSymbols, setIncludeSymbols] = useState(true);
   const [excludeSimilar, setExcludeSimilar] = useState(false);
-  const [passwordHistory, setPasswordHistory] = useLocalStorage<Array<{password: string, strength: number, timestamp: string}>>(STORAGE_KEYS.passwordHistory, []);
+  const [passwordHistory, setPasswordHistory] = useLocalStorage<Array<{ password: string, strength: number, timestamp: string }>>(STORAGE_KEYS.passwordHistory, []);
   const { copyToClipboard, isCopied } = useClipboard();
   const { showSuccess, showError, showWarning } = useToast();
   const [showPassword, setShowPassword] = useState(true);
@@ -30,36 +30,36 @@ const PasswordGeneratorPage: React.FC = () => {
       showError(error.message);
       return;
     }
-    
+
     if (length > LIMITS.maxPasswordLength) {
       showError('Password too long', `Maximum length is ${LIMITS.maxPasswordLength} characters`);
       return;
     }
-    
+
     let charset = '';
-    
+
     if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
     if (includeNumbers) charset += '0123456789';
     if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
-    
+
     if (excludeSimilar) {
       charset = charset.replace(/[il1Lo0O]/g, '');
     }
-    
+
     if (!charset) {
       setPassword('Please select at least one character type');
       showWarning('Please select at least one character type');
       return;
     }
-    
+
     let newPassword = '';
     for (let i = 0; i < length; i++) {
       newPassword += charset.charAt(Math.floor(Math.random() * charset.length));
     }
-    
+
     setPassword(newPassword);
-    
+
     // Add to history
     const strength = calculateStrength(newPassword);
     const historyEntry = {
@@ -68,7 +68,7 @@ const PasswordGeneratorPage: React.FC = () => {
       timestamp: new Date().toLocaleString()
     };
     setPasswordHistory(prev => [historyEntry, ...prev.slice(0, LIMITS.maxHistoryItems - 1)]);
-    
+
     trackToolUsage('password-generator', 'generate', {
       length,
       includeUppercase,
@@ -131,12 +131,12 @@ const PasswordGeneratorPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <BackButton />
-      <SEOHead 
+      <SEOHead
         title="Password Generator"
         description="Generate secure passwords with customizable options and strength analysis. Create unbreakable passwords in seconds."
         canonical="/password-generator"
       />
-      
+
       {/* Header */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl mb-6">
@@ -146,7 +146,7 @@ const PasswordGeneratorPage: React.FC = () => {
           Password Generator
         </h1>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-          Generate secure passwords that even hackers would respect. 
+          Generate secure passwords that even hackers would respect.
           <span className="text-purple-400"> Because "password123" isn't cutting it anymore!</span>
         </p>
       </div>
@@ -159,7 +159,7 @@ const PasswordGeneratorPage: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">Generated Password</h3>
             </div>
-            
+
             <div className="relative mb-6">
               {/* Password Display - Full Width */}
               <div className="relative mb-4">
@@ -176,7 +176,7 @@ const PasswordGeneratorPage: React.FC = () => {
                   {showPassword ? <EyeOff className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
                 </button>
               </div>
-              
+
               {/* Action Buttons - Full Width on Mobile */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
@@ -206,11 +206,10 @@ const PasswordGeneratorPage: React.FC = () => {
               </div>
               <div className="w-full bg-gray-700 rounded-full h-3">
                 <div
-                  className={`h-3 rounded-full transition-all duration-500 ${
-                    currentStrength < 30 ? 'bg-red-500' :
+                  className={`h-3 rounded-full transition-all duration-500 ${currentStrength < 30 ? 'bg-red-500' :
                     currentStrength < 60 ? 'bg-yellow-500' :
-                    currentStrength < 80 ? 'bg-blue-500' : 'bg-green-500'
-                  }`}
+                      currentStrength < 80 ? 'bg-blue-500' : 'bg-green-500'
+                    }`}
                   style={{ width: `${currentStrength}%` }}
                 ></div>
               </div>
@@ -236,7 +235,7 @@ const PasswordGeneratorPage: React.FC = () => {
           {/* Settings */}
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8">
             <h3 className="text-xl font-bold text-white mb-6">Settings</h3>
-            
+
             <div className="space-y-6">
               {/* Length */}
               <div>
