@@ -30,6 +30,9 @@ import TextCaseConverterPage from './pages/TextCaseConverterPage';
 import LoremIpsumPage from './pages/LoremIpsumPage';
 import DiffCheckerPage from './pages/DiffCheckerPage';
 import TextSummarizerPage from './pages/TextSummarizerPage';
+import GradientGeneratorPage from './pages/GradientGeneratorPage';
+import ASCIIArtGeneratorPage from './pages/ASCIIArtGeneratorPage';
+import FaviconGeneratorPage from './pages/FaviconGeneratorPage';
 import Layout from './components/Layout';
 import SEOHead from './components/SEOHead';
 
@@ -86,6 +89,9 @@ function App() {
                 <Route path="/lorem-ipsum" element={<LoremIpsumPage />} />
                 <Route path="/diff-checker" element={<DiffCheckerPage />} />
                 <Route path="/text-summarizer" element={<TextSummarizerPage />} />
+                <Route path="/gradient-generator" element={<GradientGeneratorPage />} />
+                <Route path="/ascii-art-generator" element={<ASCIIArtGeneratorPage />} />
+                <Route path="/favicon-generator" element={<FaviconGeneratorPage />} />
               </Routes>
             </Layout>
             {/* PWA Components */}
