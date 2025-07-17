@@ -24,6 +24,11 @@ import FavoritesSection from '../components/FavoritesSection';
 import FavoriteButton from '../components/FavoriteButton';
 import RecentToolsSection from '../components/RecentToolsSection';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
+import ToolCategoryShowcases from '../components/ToolCategoryShowcases';
+import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
+import EnhancedFeaturesSection from '../components/EnhancedFeaturesSection';
+import PWAPromotionSection from '../components/PWAPromotionSection';
+import EnhancedTestimonialsSection from '../components/EnhancedTestimonialsSection';
 import { useSearchModal } from '../hooks/useSearchModal';
 
 const HomePage: React.FC = () => {
@@ -289,12 +294,22 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Personalized Recommendations */}
+      <section className="relative py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <PersonalizedRecommendations />
+        </div>
+      </section>
+
       {/* Analytics Dashboard */}
       <section className="relative py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <AnalyticsDashboard />
         </div>
       </section>
+
+      {/* Tool Category Showcases */}
+      <ToolCategoryShowcases />
 
       {/* Tools Grid */}
       <section className="relative py-20 px-6">
@@ -358,171 +373,14 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Why Choose <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">BrainDead.site</span>?
-            </h2>
-            <p className="text-gray-400 text-lg">
-              Because thinking is overrated and efficiency is everything
-            </p>
-          </div>
+      {/* Enhanced Features Section */}
+      <EnhancedFeaturesSection />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center group">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Zap className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Lightning Fast</h3>
-              <p className="text-gray-400 text-sm">
-                Get results faster than your brain can process the question
-              </p>
-            </div>
+      {/* PWA Promotion Section */}
+      <PWAPromotionSection />
 
-            <div className="text-center group">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Secure & Private</h3>
-              <p className="text-gray-400 text-sm">
-                Your data stays in your browser, just like your dignity
-              </p>
-            </div>
-
-            <div className="text-center group">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Star className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Premium Quality</h3>
-              <p className="text-gray-400 text-sm">
-                Enterprise-grade tools for your amateur-grade problems
-              </p>
-            </div>
-
-            <div className="text-center group">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <ClockIcon className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Always Available</h3>
-              <p className="text-gray-400 text-sm">
-                24/7 access because procrastination doesn't keep office hours
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-gray-900/80 to-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-3xl p-12">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                  50K+
-                </div>
-                <div className="text-gray-400 text-sm">Brain Cells Saved</div>
-              </div>
-              <div>
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-2">
-                  13
-                </div>
-                <div className="text-gray-400 text-sm">Premium Tools</div>
-              </div>
-              <div>
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-400 to-red-400 bg-clip-text text-transparent mb-2">
-                  99.9%
-                </div>
-                <div className="text-gray-400 text-sm">Laziness Rate</div>
-              </div>
-              <div>
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-2">
-                  0
-                </div>
-                <div className="text-gray-400 text-sm">Thinking Required</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              What Our <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Users</span> Say
-            </h2>
-            <p className="text-gray-400 text-lg">
-              Real testimonials from real people with real brain problems
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-colors">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                  JS
-                </div>
-                <div className="ml-4">
-                  <div className="text-white font-semibold">John Smith</div>
-                  <div className="text-gray-400 text-sm">Senior Developer</div>
-                </div>
-              </div>
-              <p className="text-gray-300 text-sm italic">
-                "Finally, a calculator that doesn't judge me for not knowing what 7 × 8 equals. My productivity has increased by 420%!"
-              </p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-colors">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold">
-                  AD
-                </div>
-                <div className="ml-4">
-                  <div className="text-white font-semibold">Alice Designer</div>
-                  <div className="text-gray-400 text-sm">UI/UX Designer</div>
-                </div>
-              </div>
-              <p className="text-gray-300 text-sm italic">
-                "The color picker saved my career. I no longer have to explain to clients what 'slightly off-white' means in hex code."
-              </p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-colors">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold">
-                  MJ
-                </div>
-                <div className="ml-4">
-                  <div className="text-white font-semibold">Mike Johnson</div>
-                  <div className="text-gray-400 text-sm">Product Manager</div>
-                </div>
-              </div>
-              <p className="text-gray-300 text-sm italic">
-                "I use the password generator for everything. My passwords are now so secure, even I can't remember them!"
-              </p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Enhanced Testimonials Section */}
+      <EnhancedTestimonialsSection />
 
       {/* CTA Section */}
       <section className="relative py-20 px-6">

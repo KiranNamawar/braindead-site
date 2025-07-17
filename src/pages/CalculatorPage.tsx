@@ -1,25 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, Delete, RotateCcw } from 'lucide-react';
+import { Calculator, Delete, RotateCcw, History, Copy, Download } from 'lucide-react';
+import ToolLayout from '../components/shared/ToolLayout';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useToast } from '../components/ToastContainer';
 import { trackToolUsage } from '../utils/analytics';
-import { checkRateLimit, createRateLimiter } from '../utils/rateLimiter';
-import SEOHead from '../components/SEOHead';
-import BackButton from '../components/BackButton';
-import { LIMITS, STORAGE_KEYS } from '../utils/constants';
-import { validateNumber } from '../utils/validation';
+import { STORAGE_KEYS } from '../utils/constants';
+import { validateNumberEnhanced } from '../utils/validation';
 
-const calculatorLimiter = createRateLimiter({
-  maxRequests: 1000,
-  windowMs: 60000 // 1000 calculations per minute
-});
+interface CalculationHistory {
+  expression: string;
+  result: string;
+  timestamp: Date;
+}
+
 const CalculatorPage: React.FC = () => {
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState<number | null>(null);
   const [operation, setOperation] = useState<string | null>(null);
   const [waitingForOperand, setWaitingForOperand] = useState(false);
-  const [history, setHistory] = useLocalStorage<string[]>(STORAGE_KEYS.calculatorHistory, []);
-  const { showSuccess, showError } = useToast();
+  const [expression, setExpression] = useState('');
+  const [history, setHistory] = useLocalStorage<CalculationHistory[]>(STORAGE_KEYS.calculatorHistory, []);
+  const [showHistory, setShowHistory] = useState(false);
+  const [memory, setMemory] = useState(0);
+  const { showSuccess, showError, showWarning } = useToast();
+
+  // Check for integration data on mount
+  useEffect(() => {
+    const integrationData = sessionStorage.getItem('tool-integration-calculator');
+    if (integrationData) {
+      try {
+        const parsed = JSON.parse(integrationData);
+        if (parsed.data && typeof parsed.data === 'number') {
+          setDisplay(String(parsed.data));
+          showSuccess('Number integrated from ' + parsed.sourceToolId);
+        }
+        sessionStorage.removeItem('tool-integration-calculator');
+      } catch (error) {
+        console.warn('Failed to load integration data:', error);
+      }
+    }
+  }, [showSuccess]);
 
   const inputNumber = (num: string) => {
     if (display.length >= 15) {
@@ -49,374 +69,521 @@ const CalculatorPage: React.FC = () => {
     setPreviousValue(null);
     setOperation(null);
     setWaitingForOperand(false);
+    setExpression('');
   };
 
-  const performOperation = (nextOperation: string) => {
+  const clearEntry = () => {
+    setDisplay('0');
+  };
+
+  const backspace = () => {
+    if (display.length > 1) {
+      setDisplay(display.slice(0, -1));
+    } else {
+      setDisplay('0');
+    }
+  };
+
+  const performOperation = (nextOperation?: string) => {
     const inputValue = parseFloat(display);
-    
-    try {
-      checkRateLimit(calculatorLimiter, 'calculation');
-    } catch (error) {
-      showError(error.message);
-      return;
-    }
-    
-    if (!validateNumber(display)) {
-      showError('Invalid number');
-      return;
-    }
 
     if (previousValue === null) {
       setPreviousValue(inputValue);
+      setExpression(display);
     } else if (operation) {
       const currentValue = previousValue || 0;
-      const newValue = calculate(currentValue, inputValue, operation);
+      let result: number;
 
-      setDisplay(String(newValue));
-      setPreviousValue(newValue);
-      
-      // Add to history
-      const historyEntry = `${currentValue} ${operation} ${inputValue} = ${newValue}`;
-      setHistory(prev => [historyEntry, ...prev.slice(0, LIMITS.maxHistoryItems - 1)]);
-      
-      trackToolUsage('calculator', 'calculation', {
-        operation,
-        result: newValue
-      });
-      
-      showSuccess('Calculation completed');
+      try {
+        switch (operation) {
+          case '+':
+            result = currentValue + inputValue;
+            break;
+          case '-':
+            result = currentValue - inputValue;
+            break;
+          case '×':
+            result = currentValue * inputValue;
+            break;
+          case '÷':
+            if (inputValue === 0) {
+              showError('Cannot divide by zero');
+              return;
+            }
+            result = currentValue / inputValue;
+            break;
+          case '%':
+            result = currentValue % inputValue;
+            break;
+          case '^':
+            result = Math.pow(currentValue, inputValue);
+            break;
+          default:
+            return;
+        }
+
+        // Check for overflow or invalid results
+        if (!isFinite(result)) {
+          showError('Result is too large or invalid');
+          clear();
+          return;
+        }
+
+        const fullExpression = `${expression} ${operation} ${display}`;
+        const resultStr = formatResult(result);
+        
+        // Add to history
+        const historyEntry: CalculationHistory = {
+          expression: fullExpression,
+          result: resultStr,
+          timestamp: new Date()
+        };
+        
+        setHistory(prev => [historyEntry, ...prev.slice(0, 49)]); // Keep last 50 entries
+        
+        setDisplay(resultStr);
+        setPreviousValue(result);
+        setExpression(fullExpression);
+
+        trackToolUsage('calculator', { operation, result: resultStr });
+      } catch (error) {
+        showError('Calculation error');
+        clear();
+        return;
+      }
     }
 
     setWaitingForOperand(true);
-    setOperation(nextOperation);
+    setOperation(nextOperation || null);
   };
 
-  const calculate = (firstValue: number, secondValue: number, operation: string): number => {
-    let result: number;
+  const formatResult = (num: number): string => {
+    // Handle very large or very small numbers
+    if (Math.abs(num) >= 1e15 || (Math.abs(num) < 1e-6 && num !== 0)) {
+      return num.toExponential(6);
+    }
     
-    switch (operation) {
-      case '+':
-        result = firstValue + secondValue;
+    // Format with appropriate decimal places
+    const str = num.toString();
+    if (str.length > 12) {
+      return parseFloat(num.toPrecision(12)).toString();
+    }
+    
+    return str;
+  };
+
+  const calculate = () => {
+    performOperation();
+  };
+
+  const handleScientificFunction = (func: string) => {
+    const inputValue = parseFloat(display);
+    let result: number;
+
+    try {
+      switch (func) {
+        case 'sin':
+          result = Math.sin(inputValue * Math.PI / 180); // Convert to radians
+          break;
+        case 'cos':
+          result = Math.cos(inputValue * Math.PI / 180);
+          break;
+        case 'tan':
+          result = Math.tan(inputValue * Math.PI / 180);
+          break;
+        case 'log':
+          if (inputValue <= 0) {
+            showError('Logarithm of non-positive number');
+            return;
+          }
+          result = Math.log10(inputValue);
+          break;
+        case 'ln':
+          if (inputValue <= 0) {
+            showError('Natural logarithm of non-positive number');
+            return;
+          }
+          result = Math.log(inputValue);
+          break;
+        case 'sqrt':
+          if (inputValue < 0) {
+            showError('Square root of negative number');
+            return;
+          }
+          result = Math.sqrt(inputValue);
+          break;
+        case '1/x':
+          if (inputValue === 0) {
+            showError('Cannot divide by zero');
+            return;
+          }
+          result = 1 / inputValue;
+          break;
+        case 'x²':
+          result = inputValue * inputValue;
+          break;
+        case '±':
+          result = -inputValue;
+          break;
+        default:
+          return;
+      }
+
+      const resultStr = formatResult(result);
+      const historyEntry: CalculationHistory = {
+        expression: `${func}(${display})`,
+        result: resultStr,
+        timestamp: new Date()
+      };
+      
+      setHistory(prev => [historyEntry, ...prev.slice(0, 49)]);
+      setDisplay(resultStr);
+      setWaitingForOperand(true);
+    } catch (error) {
+      showError('Calculation error');
+    }
+  };
+
+  const handleMemoryOperation = (op: string) => {
+    const currentValue = parseFloat(display);
+    
+    switch (op) {
+      case 'MC':
+        setMemory(0);
+        showSuccess('Memory cleared');
         break;
-      case '-':
-        result = firstValue - secondValue;
+      case 'MR':
+        setDisplay(formatResult(memory));
+        setWaitingForOperand(true);
         break;
-      case '×':
-        result = firstValue * secondValue;
+      case 'M+':
+        setMemory(prev => prev + currentValue);
+        showSuccess('Added to memory');
         break;
-      case '÷':
-        if (secondValue === 0) {
-          showError('Cannot divide by zero');
-          return firstValue;
-        }
-        result = firstValue / secondValue;
+      case 'M-':
+        setMemory(prev => prev - currentValue);
+        showSuccess('Subtracted from memory');
         break;
-      case '=':
-        result = secondValue;
+      case 'MS':
+        setMemory(currentValue);
+        showSuccess('Stored in memory');
+        break;
+    }
+  };
+
+  const handleExport = (format: string) => {
+    if (history.length === 0) return;
+
+    let content: string;
+    let mimeType: string;
+    let extension: string;
+
+    switch (format) {
+      case 'json':
+        content = JSON.stringify(history, null, 2);
+        mimeType = 'application/json';
+        extension = 'json';
+        break;
+      case 'csv':
+        const csvRows = [
+          'Expression,Result,Timestamp',
+          ...history.map(h => `"${h.expression}","${h.result}","${h.timestamp.toISOString()}"`)
+        ];
+        content = csvRows.join('\n');
+        mimeType = 'text/csv';
+        extension = 'csv';
+        break;
+      case 'txt':
+        content = history
+          .map(h => `${h.expression} = ${h.result} (${h.timestamp.toLocaleString()})`)
+          .join('\n');
+        mimeType = 'text/plain';
+        extension = 'txt';
         break;
       default:
-        result = secondValue;
+        return;
     }
-    
-    // Check for overflow or invalid results
-    if (!isFinite(result)) {
-      showError('Result is too large or invalid');
-      return firstValue;
-    }
-    
-    // Round to prevent floating point precision issues
-    return Math.round(result * Math.pow(10, LIMITS.calculatorPrecision)) / Math.pow(10, LIMITS.calculatorPrecision);
+
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `calculator-history-${Date.now()}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
-  const handleKeyPress = (event: KeyboardEvent) => {
-    const { key } = event;
-    
-    if (key >= '0' && key <= '9') {
-      inputNumber(key);
-    } else if (key === '.') {
-      inputDecimal();
-    } else if (key === '+' || key === '-') {
-      performOperation(key);
-    } else if (key === '*') {
-      performOperation('×');
-    } else if (key === '/') {
-      event.preventDefault();
-      performOperation('÷');
-    } else if (key === 'Enter' || key === '=') {
-      performOperation('=');
-    } else if (key === 'Escape' || key === 'c' || key === 'C') {
-      clear();
-    } else if (key === 'Backspace') {
-      if (display.length > 1) {
-        setDisplay(display.slice(0, -1));
-      } else {
-        setDisplay('0');
+  const handleBatchProcess = async (input: string): Promise<string> => {
+    try {
+      // Simple expression evaluation for batch processing
+      const sanitized = input.replace(/[^0-9+\-*/().\s]/g, '');
+      const result = Function(`"use strict"; return (${sanitized})`)();
+      
+      if (!isFinite(result)) {
+        throw new Error('Invalid result');
       }
+      
+      return formatResult(result);
+    } catch (error) {
+      throw new Error(`Calculation failed: ${error instanceof Error ? error.message : 'Invalid expression'}`);
     }
   };
 
+  const clearHistory = () => {
+    setHistory([]);
+    showSuccess('History cleared');
+  };
+
+  const copyResult = () => {
+    navigator.clipboard.writeText(display);
+    showSuccess('Result copied to clipboard');
+  };
+
+  // Keyboard support
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return; // Don't interfere with input fields
+      }
+
+      switch (e.key) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+          inputNumber(e.key);
+          break;
+        case '.':
+          inputDecimal();
+          break;
+        case '+':
+          performOperation('+');
+          break;
+        case '-':
+          performOperation('-');
+          break;
+        case '*':
+          performOperation('×');
+          break;
+        case '/':
+          e.preventDefault();
+          performOperation('÷');
+          break;
+        case '%':
+          performOperation('%');
+          break;
+        case '=':
+        case 'Enter':
+          e.preventDefault();
+          calculate();
+          break;
+        case 'Escape':
+          clear();
+          break;
+        case 'Backspace':
+          backspace();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
   }, [display, operation, previousValue, waitingForOperand]);
 
-  const Button: React.FC<{
-    onClick: () => void;
-    className?: string;
-    children: React.ReactNode;
-  }> = ({ onClick, className = '', children }) => (
-    <button
-      onClick={onClick}
-      className={`
-        h-12 md:h-16 rounded-xl font-semibold text-base md:text-lg transition-all duration-200
-        hover:scale-105 active:scale-95 shadow-lg touch-manipulation
-        ${className}
-      `}
-    >
-      {children}
-    </button>
-  );
+  const buttonClass = "h-12 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500";
+  const numberButtonClass = `${buttonClass} bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100`;
+  const operatorButtonClass = `${buttonClass} bg-blue-600 hover:bg-blue-700 text-white`;
+  const functionButtonClass = `${buttonClass} bg-purple-600 hover:bg-purple-700 text-white`;
+  const memoryButtonClass = `${buttonClass} bg-green-600 hover:bg-green-700 text-white text-sm`;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
-      <BackButton />
-      <SEOHead 
-        title="Calculator - BrainDead"
-        description="A powerful calculator with history tracking and keyboard support. Perfect for when your brain needs a math assistant."
-        canonical="/calculator"
-      />
-      
-      {/* Header */}
-      <div className="text-center mb-8 md:mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
-          <Calculator className="w-8 h-8 text-white" />
+    <ToolLayout
+      toolId="calculator"
+      title="Enhanced Calculator"
+      description="Advanced calculator with scientific functions, memory operations, and calculation history"
+      outputData={parseFloat(display)}
+      onExport={handleExport}
+      onBatchProcess={handleBatchProcess}
+      batchInputPlaceholder="Enter mathematical expressions, one per line (e.g., 2+2, 5*3)"
+      showBatchOperations={true}
+    >
+      <div className="p-6 space-y-6">
+        {/* Display */}
+        <div className="bg-gray-900 dark:bg-gray-800 rounded-lg p-4">
+          <div className="text-right">
+            {expression && (
+              <div className="text-sm text-gray-400 mb-1 font-mono">
+                {expression}
+              </div>
+            )}
+            <div className="text-3xl font-mono text-white break-all">
+              {display}
+            </div>
+          </div>
+          <div className="flex justify-between items-center mt-2">
+            <div className="text-sm text-gray-400">
+              {memory !== 0 && `Memory: ${formatResult(memory)}`}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={copyResult}
+                className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
+              >
+                <Copy className="w-3 h-3" />
+                Copy
+              </button>
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
+              >
+                <History className="w-3 h-3" />
+                History
+              </button>
+            </div>
+          </div>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-          Smart Calculator
-        </h1>
-        <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto px-4">
-          A powerful calculator that remembers what 2+2 equals when your brain doesn't. 
-          <span className="text-blue-400"> Math anxiety not included!</span>
-        </p>
-        
-        {/* Fun Stats */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mt-6 text-sm">
-          <div className="flex items-center text-green-400">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-            <span>Keyboard shortcuts enabled</span>
-          </div>
-          <div className="flex items-center text-blue-400">
-            <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
-            <span>History tracking active</span>
-          </div>
-          <div className="flex items-center text-purple-400">
-            <div className="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></div>
-            <span>Zero brain cells required</span>
-          </div>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-        {/* Calculator */}
-        <div className="lg:col-span-2">
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-4 md:p-8">
-            {/* Display */}
-            <div className="bg-gray-800/50 rounded-2xl p-4 md:p-6 mb-6 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
-              <div className="relative text-right">
-                <div className="text-gray-500 text-xs md:text-sm mb-1 min-h-[1rem]">
-                  {previousValue !== null && operation ? `${previousValue} ${operation}` : ''}
-                </div>
-                <div className="text-2xl md:text-4xl font-mono text-white break-all min-h-[2.5rem] md:min-h-[3.5rem] flex items-center justify-end">
-                  {display}
-                </div>
-                {/* Fun calculation counter */}
-                <div className="text-xs text-gray-600 mt-2">
-                  {history.length > 0 && `${history.length} calculations done 🧮`}
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Calculator Buttons */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* Memory Operations */}
+            <div className="grid grid-cols-5 gap-2">
+              <button onClick={() => handleMemoryOperation('MC')} className={memoryButtonClass}>MC</button>
+              <button onClick={() => handleMemoryOperation('MR')} className={memoryButtonClass}>MR</button>
+              <button onClick={() => handleMemoryOperation('M+')} className={memoryButtonClass}>M+</button>
+              <button onClick={() => handleMemoryOperation('M-')} className={memoryButtonClass}>M-</button>
+              <button onClick={() => handleMemoryOperation('MS')} className={memoryButtonClass}>MS</button>
+            </div>
+
+            {/* Scientific Functions */}
+            <div className="grid grid-cols-6 gap-2">
+              <button onClick={() => handleScientificFunction('sin')} className={functionButtonClass}>sin</button>
+              <button onClick={() => handleScientificFunction('cos')} className={functionButtonClass}>cos</button>
+              <button onClick={() => handleScientificFunction('tan')} className={functionButtonClass}>tan</button>
+              <button onClick={() => handleScientificFunction('log')} className={functionButtonClass}>log</button>
+              <button onClick={() => handleScientificFunction('ln')} className={functionButtonClass}>ln</button>
+              <button onClick={() => handleScientificFunction('sqrt')} className={functionButtonClass}>√</button>
+            </div>
+
+            <div className="grid grid-cols-6 gap-2">
+              <button onClick={() => handleScientificFunction('1/x')} className={functionButtonClass}>1/x</button>
+              <button onClick={() => handleScientificFunction('x²')} className={functionButtonClass}>x²</button>
+              <button onClick={() => performOperation('^')} className={functionButtonClass}>x^y</button>
+              <button onClick={() => performOperation('%')} className={functionButtonClass}>%</button>
+              <button onClick={() => handleScientificFunction('±')} className={functionButtonClass}>±</button>
+              <button onClick={clear} className={`${buttonClass} bg-red-600 hover:bg-red-700 text-white`}>C</button>
+            </div>
+
+            {/* Main Calculator */}
+            <div className="grid grid-cols-4 gap-2">
+              <button onClick={clearEntry} className={`${buttonClass} bg-orange-600 hover:bg-orange-700 text-white`}>CE</button>
+              <button onClick={backspace} className={`${buttonClass} bg-orange-600 hover:bg-orange-700 text-white`}>
+                <Delete className="w-4 h-4 mx-auto" />
+              </button>
+              <button onClick={() => performOperation('÷')} className={operatorButtonClass}>÷</button>
+              <button onClick={() => performOperation('×')} className={operatorButtonClass}>×</button>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2">
+              <button onClick={() => inputNumber('7')} className={numberButtonClass}>7</button>
+              <button onClick={() => inputNumber('8')} className={numberButtonClass}>8</button>
+              <button onClick={() => inputNumber('9')} className={numberButtonClass}>9</button>
+              <button onClick={() => performOperation('-')} className={operatorButtonClass}>-</button>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2">
+              <button onClick={() => inputNumber('4')} className={numberButtonClass}>4</button>
+              <button onClick={() => inputNumber('5')} className={numberButtonClass}>5</button>
+              <button onClick={() => inputNumber('6')} className={numberButtonClass}>6</button>
+              <button onClick={() => performOperation('+')} className={operatorButtonClass}>+</button>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2">
+              <button onClick={() => inputNumber('1')} className={numberButtonClass}>1</button>
+              <button onClick={() => inputNumber('2')} className={numberButtonClass}>2</button>
+              <button onClick={() => inputNumber('3')} className={numberButtonClass}>3</button>
+              <button onClick={calculate} className={`${operatorButtonClass} row-span-2`}>=</button>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2">
+              <button onClick={() => inputNumber('0')} className={`${numberButtonClass} col-span-2`}>0</button>
+              <button onClick={inputDecimal} className={numberButtonClass}>.</button>
+            </div>
+          </div>
+
+          {/* History Panel */}
+          {showHistory && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  History
+                </h3>
+                <button
+                  onClick={clearHistory}
+                  className="text-sm text-red-600 dark:text-red-400 hover:underline"
+                >
+                  Clear
+                </button>
+              </div>
+              
+              <div className="max-h-96 overflow-y-auto space-y-2">
+                {history.length === 0 ? (
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    No calculations yet
+                  </p>
+                ) : (
+                  history.map((entry, index) => (
+                    <div
+                      key={index}
+                      className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => {
+                        setDisplay(entry.result);
+                        setWaitingForOperand(true);
+                      }}
+                    >
+                      <div className="text-sm text-gray-600 dark:text-gray-400 font-mono">
+                        {entry.expression}
+                      </div>
+                      <div className="font-mono text-gray-900 dark:text-gray-100">
+                        = {entry.result}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        {entry.timestamp.toLocaleTimeString()}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
-
-            {/* Buttons */}
-            <div className="grid grid-cols-4 gap-4">
-              {/* Row 1 */}
-              <Button
-                onClick={clear}
-                className="bg-gradient-to-br from-red-500 to-red-600 text-white hover:from-red-400 hover:to-red-500"
-              >
-                <RotateCcw className="w-5 h-5 mx-auto" />
-              </Button>
-              <Button
-                onClick={() => {
-                  if (display.length > 1) {
-                    setDisplay(display.slice(0, -1));
-                  } else {
-                    setDisplay('0');
-                  }
-                }}
-                className="bg-gradient-to-br from-gray-600 to-gray-700 text-white hover:from-gray-500 hover:to-gray-600"
-              >
-                <Delete className="w-5 h-5 mx-auto" />
-              </Button>
-              <Button
-                onClick={() => performOperation('÷')}
-                className="bg-gradient-to-br from-orange-500 to-orange-600 text-white hover:from-orange-400 hover:to-orange-500"
-              >
-                ÷
-              </Button>
-              <Button
-                onClick={() => performOperation('×')}
-                className="bg-gradient-to-br from-orange-500 to-orange-600 text-white hover:from-orange-400 hover:to-orange-500"
-              >
-                ×
-              </Button>
-
-              {/* Row 2 */}
-              <Button
-                onClick={() => inputNumber('7')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                7
-              </Button>
-              <Button
-                onClick={() => inputNumber('8')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                8
-              </Button>
-              <Button
-                onClick={() => inputNumber('9')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                9
-              </Button>
-              <Button
-                onClick={() => performOperation('-')}
-                className="bg-gradient-to-br from-orange-500 to-orange-600 text-white hover:from-orange-400 hover:to-orange-500"
-              >
-                -
-              </Button>
-
-              {/* Row 3 */}
-              <Button
-                onClick={() => inputNumber('4')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                4
-              </Button>
-              <Button
-                onClick={() => inputNumber('5')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                5
-              </Button>
-              <Button
-                onClick={() => inputNumber('6')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                6
-              </Button>
-              <Button
-                onClick={() => performOperation('+')}
-                className="bg-gradient-to-br from-orange-500 to-orange-600 text-white hover:from-orange-400 hover:to-orange-500"
-              >
-                +
-              </Button>
-
-              {/* Row 4 */}
-              <Button
-                onClick={() => inputNumber('1')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                1
-              </Button>
-              <Button
-                onClick={() => inputNumber('2')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                2
-              </Button>
-              <Button
-                onClick={() => inputNumber('3')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                3
-              </Button>
-              <Button
-                onClick={() => performOperation('=')}
-                className="bg-gradient-to-br from-blue-500 to-purple-600 text-white hover:from-blue-400 hover:to-purple-500 row-span-2"
-              >
-                =
-              </Button>
-
-              {/* Row 5 */}
-              <Button
-                onClick={() => inputNumber('0')}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700 col-span-2"
-              >
-                0
-              </Button>
-              <Button
-                onClick={inputDecimal}
-                className="bg-gradient-to-br from-gray-700 to-gray-800 text-white hover:from-gray-600 hover:to-gray-700"
-              >
-                .
-              </Button>
-            </div>
-          </div>
+          )}
         </div>
 
-        {/* History */}
-        <div className="lg:col-span-1">
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-6">
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-3 animate-pulse"></span>
-              History
-            </h3>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {history.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
-                  No calculations yet.<br />
-                  <span className="text-sm">Start calculating to see history!</span>
-                </p>
-              ) : (
-                history.map((entry, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-800/50 rounded-lg p-3 text-sm font-mono text-gray-300 hover:bg-gray-700/50 transition-colors cursor-pointer"
-                    onClick={() => {
-                      const result = entry.split(' = ')[1];
-                      setDisplay(result);
-                    }}
-                  >
-                    {entry}
-                  </div>
-                ))
-              )}
-            </div>
-            {history.length > 0 && (
-              <button
-                onClick={() => setHistory([])}
-                className="w-full mt-4 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-400 text-sm transition-colors"
-              >
-                Clear History
-              </button>
-            )}
-          </div>
-
-          {/* Tips */}
-          <div className="mt-6 bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6">
-            <h4 className="text-lg font-semibold text-white mb-3">💡 Pro Tips</h4>
-            <ul className="text-sm text-gray-400 space-y-2">
-              <li>• Use keyboard for faster input</li>
-              <li>• Press 'C' or 'Escape' to clear</li>
-              <li>• Click history entries to reuse results</li>
-              <li>• Backspace to delete last digit</li>
-            </ul>
+        {/* Keyboard Shortcuts */}
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+            ⌨️ Keyboard Shortcuts
+          </h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-blue-700 dark:text-blue-300">
+            <div>Numbers: 0-9</div>
+            <div>Operators: + - * /</div>
+            <div>Decimal: .</div>
+            <div>Calculate: Enter or =</div>
+            <div>Clear: Escape</div>
+            <div>Backspace: ⌫</div>
+            <div>Percent: %</div>
+            <div>Memory: M keys</div>
           </div>
         </div>
       </div>
-    </div>
+    </ToolLayout>
   );
 };
 

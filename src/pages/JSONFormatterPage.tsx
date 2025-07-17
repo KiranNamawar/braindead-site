@@ -1,403 +1,332 @@
-import React, { useState } from 'react';
-import { Code, Copy, Download, Upload, CheckCircle, XCircle, Minimize, Maximize } from 'lucide-react';
-import BackButton from '../components/BackButton';
-import { validateJSON } from '../utils/validation';
+import React, { useState, useEffect } from 'react';
+import { Code, Copy, Download, Upload, CheckCircle, XCircle, Minimize, Maximize, FileText, Zap } from 'lucide-react';
+import ToolLayout from '../components/shared/ToolLayout';
+import { validateJSONEnhanced, ValidationResult } from '../utils/validation';
 import { LIMITS } from '../utils/constants';
+import { useToast } from '../components/ToastContainer';
 
 const JSONFormatterPage: React.FC = () => {
+  const { showSuccess, showError, showWarning } = useToast();
   const [inputJson, setInputJson] = useState('');
   const [outputJson, setOutputJson] = useState('');
-  const [isValid, setIsValid] = useState<boolean | null>(null);
-  const [error, setError] = useState('');
-  const [copyFeedback, setCopyFeedback] = useState('');
+  const [validation, setValidation] = useState<ValidationResult>({ isValid: true });
   const [indentSize, setIndentSize] = useState(2);
+  const [operation, setOperation] = useState<'format' | 'minify' | 'validate'>('format');
 
-  const formatJson = () => {
+  // Check for integration data on mount
+  useEffect(() => {
+    const integrationData = sessionStorage.getItem('tool-integration-json-formatter');
+    if (integrationData) {
+      try {
+        const parsed = JSON.parse(integrationData);
+        if (parsed.data && typeof parsed.data === 'string') {
+          setInputJson(parsed.data);
+          showSuccess('Data integrated from ' + parsed.sourceToolId);
+        }
+        sessionStorage.removeItem('tool-integration-json-formatter');
+      } catch (error) {
+        console.warn('Failed to load integration data:', error);
+      }
+    }
+  }, [showSuccess]);
+
+  // Auto-validate JSON as user types
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (inputJson.trim()) {
+        const result = validateJSONEnhanced(inputJson);
+        setValidation(result);
+        
+        if (result.warnings && result.warnings.length > 0) {
+          result.warnings.forEach(warning => showWarning(warning));
+        }
+      } else {
+        setValidation({ isValid: true });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [inputJson, showWarning]);
+
+  const processJson = () => {
     if (!inputJson.trim()) {
-      setOutputJson('');
-      setIsValid(null);
-      setError('');
-      return;
-    }
-    
-    if (inputJson.length > LIMITS.maxTextLength) {
-      setError(`JSON too large. Maximum size is ${LIMITS.maxTextLength / 1000}KB`);
-      setIsValid(false);
+      showError('Please enter JSON to process');
       return;
     }
 
-    const validation = validateJSON(inputJson);
-    if (!validation.isValid) {
-      setIsValid(false);
-      setError(validation.error || 'Invalid JSON');
-      setOutputJson('');
+    const result = validateJSONEnhanced(inputJson);
+    setValidation(result);
+
+    if (!result.isValid) {
+      showError('Invalid JSON', result.error);
+      if (result.suggestions) {
+        result.suggestions.forEach(suggestion => showWarning(suggestion));
+      }
       return;
     }
-    
+
     try {
       const parsed = JSON.parse(inputJson);
-      const formatted = JSON.stringify(parsed, null, indentSize);
-      setOutputJson(formatted);
-      setIsValid(true);
-      setError('');
-    } catch (err) {
-      setIsValid(false);
-      setError(err instanceof Error ? err.message : 'Invalid JSON');
-      setOutputJson('');
+      let processed: string;
+
+      switch (operation) {
+        case 'format':
+          processed = JSON.stringify(parsed, null, indentSize);
+          break;
+        case 'minify':
+          processed = JSON.stringify(parsed);
+          break;
+        case 'validate':
+          processed = 'JSON is valid ✓';
+          break;
+        default:
+          processed = JSON.stringify(parsed, null, indentSize);
+      }
+
+      setOutputJson(processed);
+      showSuccess(`JSON ${operation}ted successfully`);
+    } catch (error) {
+      showError('Processing failed', error instanceof Error ? error.message : 'Unknown error');
     }
-  };
-
-  const minifyJson = () => {
-    if (!inputJson.trim()) return;
-
-    try {
-      const parsed = JSON.parse(inputJson);
-      const minified = JSON.stringify(parsed);
-      setOutputJson(minified);
-      setIsValid(true);
-      setError('');
-    } catch (err) {
-      setIsValid(false);
-      setError(err instanceof Error ? err.message : 'Invalid JSON');
-      setOutputJson('');
-    }
-  };
-
-  const validateJson = () => {
-    if (!inputJson.trim()) {
-      setIsValid(null);
-      setError('');
-      return;
-    }
-
-    try {
-      JSON.parse(inputJson);
-      setIsValid(true);
-      setError('');
-    } catch (err) {
-      setIsValid(false);
-      setError(err instanceof Error ? err.message : 'Invalid JSON');
-    }
-  };
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopyFeedback('Copied!');
-      setTimeout(() => setCopyFeedback(''), 2000);
-    } catch (err) {
-      setCopyFeedback('Failed to copy');
-      setTimeout(() => setCopyFeedback(''), 2000);
-    }
-  };
-
-  const downloadJson = () => {
-    if (!outputJson) return;
-
-    const blob = new Blob([outputJson], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'formatted.json';
-    link.click();
-    URL.revokeObjectURL(url);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (file.size > LIMITS.maxFileSize) {
+      showError('File too large', `Maximum file size is ${LIMITS.maxFileSize / 1024 / 1024}MB`);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
       setInputJson(content);
+      showSuccess('File loaded successfully');
+    };
+    reader.onerror = () => {
+      showError('Failed to read file');
     };
     reader.readAsText(file);
   };
 
-  const sampleJsons = [
-    {
-      name: 'Simple Object',
-      json: '{"name":"John Doe","age":30,"city":"New York"}'
-    },
-    {
-      name: 'Array with Objects',
-      json: '[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}]'
-    },
-    {
-      name: 'Nested Structure',
-      json: '{"user":{"profile":{"name":"Jane","settings":{"theme":"dark","notifications":true}}}}'
-    },
-    {
-      name: 'API Response',
-      json: '{"status":"success","data":{"users":[{"id":1,"email":"user@example.com","active":true}],"total":1},"timestamp":"2024-01-01T00:00:00Z"}'
+  const handleExport = (format: string) => {
+    if (!outputJson) return;
+
+    let content: string;
+    let mimeType: string;
+    let extension: string;
+
+    switch (format) {
+      case 'json':
+        content = outputJson;
+        mimeType = 'application/json';
+        extension = 'json';
+        break;
+      case 'txt':
+        content = outputJson;
+        mimeType = 'text/plain';
+        extension = 'txt';
+        break;
+      default:
+        content = outputJson;
+        mimeType = 'application/json';
+        extension = 'json';
     }
-  ];
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      validateJson();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [inputJson]);
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `json-${operation}-${Date.now()}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
-  const getJsonStats = (json: string) => {
-    if (!json) return null;
-    
+  const handleBatchProcess = async (input: string): Promise<string> => {
     try {
-      const parsed = JSON.parse(json);
-      const stringify = JSON.stringify(parsed);
-      
-      const countObjects = (obj: any): number => {
-        if (typeof obj !== 'object' || obj === null) return 0;
-        if (Array.isArray(obj)) {
-          return obj.reduce((count, item) => count + countObjects(item), 0);
-        }
-        return 1 + Object.values(obj).reduce((count: number, value) => count + countObjects(value), 0);
-      };
+      const result = validateJSONEnhanced(input);
+      if (!result.isValid) {
+        throw new Error(result.error || 'Invalid JSON');
+      }
 
-      const countArrays = (obj: any): number => {
-        if (typeof obj !== 'object' || obj === null) return 0;
-        if (Array.isArray(obj)) {
-          return 1 + obj.reduce((count, item) => count + countArrays(item), 0);
-        }
-        return Object.values(obj).reduce((count: number, value) => count + countArrays(value), 0);
-      };
-
-      const countKeys = (obj: any): number => {
-        if (typeof obj !== 'object' || obj === null) return 0;
-        if (Array.isArray(obj)) {
-          return obj.reduce((count, item) => count + countKeys(item), 0);
-        }
-        return Object.keys(obj).length + Object.values(obj).reduce((count: number, value) => count + countKeys(value), 0);
-      };
-
-      return {
-        size: stringify.length,
-        objects: countObjects(parsed),
-        arrays: countArrays(parsed),
-        keys: countKeys(parsed),
-        type: Array.isArray(parsed) ? 'Array' : typeof parsed
-      };
-    } catch {
-      return null;
+      const parsed = JSON.parse(input);
+      switch (operation) {
+        case 'format':
+          return JSON.stringify(parsed, null, indentSize);
+        case 'minify':
+          return JSON.stringify(parsed);
+        case 'validate':
+          return 'Valid JSON ✓';
+        default:
+          return JSON.stringify(parsed, null, indentSize);
+      }
+    } catch (error) {
+      throw new Error(`Processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
-  const stats = getJsonStats(inputJson);
-
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <BackButton />
-      {/* Header */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-violet-500 to-fuchsia-600 rounded-2xl mb-6">
-          <Code className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent mb-4">
-          JSON Formatter
-        </h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-          Format, validate, and minify JSON data with syntax highlighting and error detection. 
-          <span className="text-violet-400"> Because messy JSON is a crime against humanity!</span>
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Input Section */}
-        <div className="space-y-6">
-          {/* Input Controls */}
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">Input JSON</h3>
-              <div className="flex items-center space-x-2">
-                {isValid === true && (
-                  <div className="flex items-center space-x-1 text-green-400">
-                    <CheckCircle className="w-4 h-4" />
-                    <span className="text-sm">Valid</span>
-                  </div>
-                )}
-                {isValid === false && (
-                  <div className="flex items-center space-x-1 text-red-400">
-                    <XCircle className="w-4 h-4" />
-                    <span className="text-sm">Invalid</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="json-upload"
-                />
-                <label
-                  htmlFor="json-upload"
-                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-white text-sm transition-colors cursor-pointer flex items-center space-x-2"
-                >
-                  <Upload className="w-4 h-4" />
-                  <span>Upload JSON</span>
-                </label>
-
-                <div className="flex items-center space-x-2">
-                  <label className="text-gray-400 text-sm">Indent:</label>
-                  <select
-                    value={indentSize}
-                    onChange={(e) => setIndentSize(Number(e.target.value))}
-                    className="px-3 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:border-violet-500 focus:outline-none"
-                  >
-                    <option value={2}>2 spaces</option>
-                    <option value={4}>4 spaces</option>
-                    <option value={8}>8 spaces</option>
-                  </select>
-                </div>
-              </div>
-
-              <textarea
-                value={inputJson}
-                onChange={(e) => setInputJson(e.target.value)}
-                placeholder="Paste your JSON here..."
-                className="w-full h-80 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white font-mono text-sm resize-none focus:border-violet-500 focus:outline-none"
-              />
-
-              {error && (
-                <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-                  <div className="text-red-400 text-sm font-semibold mb-1">Error:</div>
-                  <div className="text-red-300 text-sm">{error}</div>
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={formatJson}
-                  className="px-6 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-600 rounded-xl font-semibold text-white hover:from-violet-400 hover:to-fuchsia-500 transition-all duration-300 flex items-center space-x-2"
-                >
-                  <Maximize className="w-4 h-4" />
-                  <span>Format</span>
-                </button>
-                <button
-                  onClick={minifyJson}
-                  className="px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-white transition-colors flex items-center space-x-2"
-                >
-                  <Minimize className="w-4 h-4" />
-                  <span>Minify</span>
-                </button>
-              </div>
-            </div>
+    <ToolLayout
+      toolId="json-formatter"
+      title="JSON Formatter"
+      description="Format, validate, and minify JSON data with enhanced error handling and batch processing"
+      outputData={outputJson}
+      onExport={handleExport}
+      onBatchProcess={handleBatchProcess}
+      batchInputPlaceholder="Enter JSON strings, one per line"
+      showBatchOperations={true}
+    >
+      <div className="p-6 space-y-6">
+        {/* Controls */}
+        <div className="flex flex-wrap items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Operation:
+            </label>
+            <select
+              value={operation}
+              onChange={(e) => setOperation(e.target.value as any)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="format">Format</option>
+              <option value="minify">Minify</option>
+              <option value="validate">Validate</option>
+            </select>
           </div>
 
-          {/* Sample JSONs */}
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8">
-            <h3 className="text-xl font-bold text-white mb-6">Sample JSONs</h3>
-            <div className="space-y-2">
-              {sampleJsons.map((sample, index) => (
-                <button
-                  key={index}
-                  onClick={() => setInputJson(sample.json)}
-                  className="w-full text-left px-4 py-3 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 rounded-xl text-white transition-colors"
-                >
-                  <div className="font-semibold text-sm mb-1">{sample.name}</div>
-                  <div className="text-gray-400 text-xs font-mono truncate">{sample.json}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Output Section */}
-        <div className="space-y-6">
-          {/* Output */}
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">Formatted Output</h3>
-              {copyFeedback && (
-                <span className="text-green-400 text-sm">{copyFeedback}</span>
-              )}
-            </div>
-
-            <textarea
-              value={outputJson}
-              readOnly
-              placeholder="Formatted JSON will appear here..."
-              className="w-full h-80 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white font-mono text-sm resize-none focus:border-violet-500 focus:outline-none"
-            />
-
-            <div className="flex justify-between items-center mt-4">
-              <span className="text-gray-400 text-sm">
-                {outputJson ? `${outputJson.length} characters` : 'No output'}
-              </span>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => copyToClipboard(outputJson)}
-                  disabled={!outputJson}
-                  className="px-4 py-2 bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 rounded-lg text-violet-400 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
-                >
-                  <Copy className="w-4 h-4" />
-                  <span>Copy</span>
-                </button>
-                <button
-                  onClick={downloadJson}
-                  disabled={!outputJson}
-                  className="px-4 py-2 bg-fuchsia-500/20 hover:bg-fuchsia-500/30 border border-fuchsia-500/30 rounded-lg text-fuchsia-400 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* JSON Statistics */}
-          {stats && (
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8">
-              <h3 className="text-xl font-bold text-white mb-6">JSON Statistics</h3>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-800/50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-violet-400">{stats.size}</div>
-                  <div className="text-gray-400 text-sm">Characters</div>
-                </div>
-                <div className="bg-gray-800/50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-fuchsia-400">{stats.objects}</div>
-                  <div className="text-gray-400 text-sm">Objects</div>
-                </div>
-                <div className="bg-gray-800/50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-400">{stats.arrays}</div>
-                  <div className="text-gray-400 text-sm">Arrays</div>
-                </div>
-                <div className="bg-gray-800/50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-green-400">{stats.keys}</div>
-                  <div className="text-gray-400 text-sm">Keys</div>
-                </div>
-              </div>
-
-              <div className="mt-4 p-4 bg-gray-800/50 rounded-xl">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Root Type:</span>
-                  <span className="text-white font-semibold">{stats.type}</span>
-                </div>
-              </div>
+          {operation === 'format' && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Indent:
+              </label>
+              <select
+                value={indentSize}
+                onChange={(e) => setIndentSize(Number(e.target.value))}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value={2}>2 spaces</option>
+                <option value={4}>4 spaces</option>
+                <option value={8}>8 spaces</option>
+              </select>
             </div>
           )}
 
-          {/* Tips */}
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6">
-            <h4 className="text-lg font-semibold text-white mb-3">📝 Pro Tips</h4>
-            <ul className="text-sm text-gray-400 space-y-2">
-              <li>• Use 2-space indentation for web APIs</li>
-              <li>• Minify JSON for production to save bandwidth</li>
-              <li>• Validate JSON before sending to APIs</li>
-              <li>• Use proper quotes (double quotes only)</li>
-              <li>• Avoid trailing commas in JSON</li>
-            </ul>
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              accept=".json,.txt"
+              onChange={handleFileUpload}
+              className="hidden"
+              id="json-upload"
+            />
+            <label
+              htmlFor="json-upload"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg cursor-pointer transition-colors"
+            >
+              <Upload className="w-4 h-4" />
+              Upload File
+            </label>
+          </div>
+
+          <button
+            onClick={processJson}
+            className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            <Zap className="w-4 h-4" />
+            Process JSON
+          </button>
+        </div>
+
+        {/* Validation Status */}
+        {validation && (
+          <div className={`p-4 rounded-lg border ${
+            validation.isValid 
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+          }`}>
+            <div className="flex items-center gap-2 mb-2">
+              {validation.isValid ? (
+                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+              )}
+              <span className={`font-medium ${
+                validation.isValid 
+                  ? 'text-green-800 dark:text-green-200'
+                  : 'text-red-800 dark:text-red-200'
+              }`}>
+                {validation.isValid ? 'Valid JSON' : 'Invalid JSON'}
+              </span>
+            </div>
+            
+            {validation.error && (
+              <p className="text-red-700 dark:text-red-300 text-sm mb-2">
+                {validation.error}
+              </p>
+            )}
+            
+            {validation.suggestions && validation.suggestions.length > 0 && (
+              <div className="text-sm">
+                <p className="font-medium text-gray-700 dark:text-gray-300 mb-1">Suggestions:</p>
+                <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
+                  {validation.suggestions.map((suggestion, index) => (
+                    <li key={index}>{suggestion}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Input Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Input JSON
+            </h3>
+            
+            <textarea
+              value={inputJson}
+              onChange={(e) => setInputJson(e.target.value)}
+              placeholder="Paste your JSON here..."
+              className="w-full h-80 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Output Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Output
+            </h3>
+            
+            <textarea
+              value={outputJson}
+              readOnly
+              placeholder="Processed JSON will appear here..."
+              className="w-full h-80 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-mono text-sm resize-none"
+            />
           </div>
         </div>
+
+        {/* Tips */}
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+            💡 Pro Tips
+          </h4>
+          <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+            <li>• Use 2-space indentation for web APIs</li>
+            <li>• Minify JSON for production to save bandwidth</li>
+            <li>• Always validate JSON before sending to APIs</li>
+            <li>• Use proper quotes (double quotes only)</li>
+            <li>• Avoid trailing commas in JSON</li>
+          </ul>
+        </div>
       </div>
-    </div>
+    </ToolLayout>
   );
 };
 

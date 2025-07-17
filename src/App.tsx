@@ -7,6 +7,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './components/ToastContainer';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
+import AccessibilityEnhancements from './components/shared/AccessibilityEnhancements';
 import HomePage from './pages/HomePage';
 import CalculatorPage from './pages/CalculatorPage';
 import ColorPickerPage from './pages/ColorPickerPage';
@@ -72,54 +73,56 @@ function App() {
     <ErrorBoundary>
       <HelmetProvider>
         <ToastProvider>
-          <Router>
-            <ScrollToTop />
-            <Layout>
-              <SEOHead />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/calculator" element={<CalculatorPage />} />
-                <Route path="/color-picker" element={<ColorPickerPage />} />
-                <Route path="/qr-generator" element={<QRGeneratorPage />} />
-                <Route path="/text-tools" element={<TextToolsPage />} />
-                <Route path="/password-generator" element={<PasswordGeneratorPage />} />
-                <Route path="/hash-generator" element={<HashGeneratorPage />} />
-                <Route path="/image-optimizer" element={<ImageOptimizerPage />} />
-                <Route path="/timestamp-converter" element={<TimestampConverterPage />} />
-                <Route path="/json-formatter" element={<JSONFormatterPage />} />
-                <Route path="/random-generator" element={<RandomGeneratorPage />} />
-                <Route path="/unit-converter" element={<UnitConverterPage />} />
-                <Route path="/tip-calculator" element={<TipCalculatorPage />} />
-                <Route path="/age-calculator" element={<AgeCalculatorPage />} />
-                <Route path="/bmi-calculator" element={<BMICalculatorPage />} />
-                <Route path="/loan-calculator" element={<LoanCalculatorPage />} />
-                <Route path="/percentage-calculator" element={<PercentageCalculatorPage />} />
-                <Route path="/grade-calculator" element={<GradeCalculatorPage />} />
-                <Route path="/word-counter" element={<WordCounterPage />} />
-                <Route path="/text-case-converter" element={<TextCaseConverterPage />} />
-                <Route path="/lorem-ipsum" element={<LoremIpsumPage />} />
-                <Route path="/diff-checker" element={<DiffCheckerPage />} />
-                <Route path="/text-summarizer" element={<TextSummarizerPage />} />
-                <Route path="/gradient-generator" element={<GradientGeneratorPage />} />
-                <Route path="/ascii-art-generator" element={<ASCIIArtGeneratorPage />} />
-                <Route path="/favicon-generator" element={<FaviconGeneratorPage />} />
-                <Route path="/pomodoro-timer" element={<PomodoroTimerPage />} />
-                <Route path="/world-clock" element={<WorldClockPage />} />
-                <Route path="/stopwatch-timer" element={<StopwatchTimerPage />} />
-                <Route path="/countdown-timer" element={<CountdownTimerPage />} />
-                <Route path="/base64-encoder" element={<Base64EncoderPage />} />
-                <Route path="/url-encoder" element={<URLEncoderPage />} />
-                <Route path="/markdown-editor" element={<MarkdownEditorPage />} />
-                <Route path="/uuid-generator" element={<UUIDGeneratorPage />} />
-                <Route path="/jwt-decoder" element={<JWTDecoderPage />} />
-                <Route path="/number-converter" element={<NumberConverterPage />} />
-                <Route path="/roman-numeral" element={<RomanNumeralPage />} />
-              </Routes>
-            </Layout>
-            {/* PWA Components */}
-            <OfflineIndicator />
-            <PWAInstallPrompt />
-          </Router>
+          <AccessibilityEnhancements>
+            <Router>
+              <ScrollToTop />
+              <Layout>
+                <SEOHead />
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/calculator" element={<CalculatorPage />} />
+                  <Route path="/color-picker" element={<ColorPickerPage />} />
+                  <Route path="/qr-generator" element={<QRGeneratorPage />} />
+                  <Route path="/text-tools" element={<TextToolsPage />} />
+                  <Route path="/password-generator" element={<PasswordGeneratorPage />} />
+                  <Route path="/hash-generator" element={<HashGeneratorPage />} />
+                  <Route path="/image-optimizer" element={<ImageOptimizerPage />} />
+                  <Route path="/timestamp-converter" element={<TimestampConverterPage />} />
+                  <Route path="/json-formatter" element={<JSONFormatterPage />} />
+                  <Route path="/random-generator" element={<RandomGeneratorPage />} />
+                  <Route path="/unit-converter" element={<UnitConverterPage />} />
+                  <Route path="/tip-calculator" element={<TipCalculatorPage />} />
+                  <Route path="/age-calculator" element={<AgeCalculatorPage />} />
+                  <Route path="/bmi-calculator" element={<BMICalculatorPage />} />
+                  <Route path="/loan-calculator" element={<LoanCalculatorPage />} />
+                  <Route path="/percentage-calculator" element={<PercentageCalculatorPage />} />
+                  <Route path="/grade-calculator" element={<GradeCalculatorPage />} />
+                  <Route path="/word-counter" element={<WordCounterPage />} />
+                  <Route path="/text-case-converter" element={<TextCaseConverterPage />} />
+                  <Route path="/lorem-ipsum" element={<LoremIpsumPage />} />
+                  <Route path="/diff-checker" element={<DiffCheckerPage />} />
+                  <Route path="/text-summarizer" element={<TextSummarizerPage />} />
+                  <Route path="/gradient-generator" element={<GradientGeneratorPage />} />
+                  <Route path="/ascii-art-generator" element={<ASCIIArtGeneratorPage />} />
+                  <Route path="/favicon-generator" element={<FaviconGeneratorPage />} />
+                  <Route path="/pomodoro-timer" element={<PomodoroTimerPage />} />
+                  <Route path="/world-clock" element={<WorldClockPage />} />
+                  <Route path="/stopwatch-timer" element={<StopwatchTimerPage />} />
+                  <Route path="/countdown-timer" element={<CountdownTimerPage />} />
+                  <Route path="/base64-encoder" element={<Base64EncoderPage />} />
+                  <Route path="/url-encoder" element={<URLEncoderPage />} />
+                  <Route path="/markdown-editor" element={<MarkdownEditorPage />} />
+                  <Route path="/uuid-generator" element={<UUIDGeneratorPage />} />
+                  <Route path="/jwt-decoder" element={<JWTDecoderPage />} />
+                  <Route path="/number-converter" element={<NumberConverterPage />} />
+                  <Route path="/roman-numeral" element={<RomanNumeralPage />} />
+                </Routes>
+              </Layout>
+              {/* PWA Components */}
+              <OfflineIndicator />
+              <PWAInstallPrompt />
+            </Router>
+          </AccessibilityEnhancements>
         </ToastProvider>
       </HelmetProvider>
     </ErrorBoundary>
