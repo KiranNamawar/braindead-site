@@ -8,12 +8,8 @@
   # Default build command
   command = "npm run build"
 
-[build.environment]
-  # Node.js version - using specific LTS version
-  NODE_VERSION = "20.18.0"
-  
-  # NPM version
-  NPM_VERSION = "10"
+# Let Netlify use its default Node.js version
+# [build.environment]
 
 # SPA redirect rules for React Router
 [[redirects]]
