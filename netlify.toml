@@ -9,8 +9,8 @@
   command = "npm run build"
 
 [build.environment]
-  # Node.js version
-  NODE_VERSION = "20"
+  # Node.js version - using specific LTS version
+  NODE_VERSION = "20.18.0"
   
   # NPM version
   NPM_VERSION = "10"
