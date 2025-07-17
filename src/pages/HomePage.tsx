@@ -175,13 +175,29 @@ const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mb-8 shadow-2xl">
-              <Brain className="w-12 h-12 text-white" />
+              {/* Dead Brain Logo with X eyes */}
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Brain shape */}
+                <path d="M24 6C30 6 35 11 35 17C35 20 34 22.5 32.5 24.5C33.5 25.5 34 27 34 28.5C34 32 31 35 27.5 35H20.5C17 35 14 32 14 28.5C14 27 14.5 25.5 15.5 24.5C14 22.5 13 20 13 17C13 11 18 6 24 6Z" fill="white" opacity="0.95"/>
+                {/* Brain division */}
+                <path d="M24 6C24 15 24 30 24 35" stroke="#3b82f6" strokeWidth="1" opacity="0.3"/>
+                {/* X Eyes (Dead brain) */}
+                <g stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.9">
+                  {/* Left X eye */}
+                  <line x1="19" y1="14" x2="21" y2="16"/>
+                  <line x1="21" y1="14" x2="19" y2="16"/>
+                  {/* Right X eye */}
+                  <line x1="27" y1="14" x2="29" y2="16"/>
+                  <line x1="29" y1="14" x2="27" y2="16"/>
+                </g>
+                {/* Sleepy mouth */}
+                <path d="M21 22C22 23 26 23 27 22" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.8"/>
+              </svg>
             </div>
             <h1 className="text-6xl md:text-8xl font-black mb-6">
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 BrainDead
               </span>
-              <span className="text-gray-300">.site</span>
             </h1>
             <p className="text-2xl md:text-3xl text-gray-400 mb-4 font-light">
               Premium utility tools for effortless productivity

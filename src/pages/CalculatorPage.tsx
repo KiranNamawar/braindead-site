@@ -168,8 +168,8 @@ const CalculatorPage: React.FC = () => {
     <button
       onClick={onClick}
       className={`
-        h-16 rounded-xl font-semibold text-lg transition-all duration-200
-        hover:scale-105 active:scale-95 shadow-lg
+        h-12 md:h-16 rounded-xl font-semibold text-base md:text-lg transition-all duration-200
+        hover:scale-105 active:scale-95 shadow-lg touch-manipulation
         ${className}
       `}
     >
@@ -178,40 +178,61 @@ const CalculatorPage: React.FC = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
       <BackButton />
       <SEOHead 
-        title="Calculator"
+        title="Calculator - BrainDead"
         description="A powerful calculator with history tracking and keyboard support. Perfect for when your brain needs a math assistant."
         canonical="/calculator"
       />
       
       {/* Header */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6">
+      <div className="text-center mb-8 md:mb-12">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
           <Calculator className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-          Calculator
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+          Smart Calculator
         </h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto px-4">
           A powerful calculator that remembers what 2+2 equals when your brain doesn't. 
           <span className="text-blue-400"> Math anxiety not included!</span>
         </p>
+        
+        {/* Fun Stats */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mt-6 text-sm">
+          <div className="flex items-center text-green-400">
+            <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+            <span>Keyboard shortcuts enabled</span>
+          </div>
+          <div className="flex items-center text-blue-400">
+            <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
+            <span>History tracking active</span>
+          </div>
+          <div className="flex items-center text-purple-400">
+            <div className="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></div>
+            <span>Zero brain cells required</span>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Calculator */}
         <div className="lg:col-span-2">
-          <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-8">
+          <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-4 md:p-8">
             {/* Display */}
-            <div className="bg-gray-800/50 rounded-2xl p-6 mb-6">
-              <div className="text-right">
-                <div className="text-gray-500 text-sm mb-1">
+            <div className="bg-gray-800/50 rounded-2xl p-4 md:p-6 mb-6 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
+              <div className="relative text-right">
+                <div className="text-gray-500 text-xs md:text-sm mb-1 min-h-[1rem]">
                   {previousValue !== null && operation ? `${previousValue} ${operation}` : ''}
                 </div>
-                <div className="text-4xl font-mono text-white break-all">
+                <div className="text-2xl md:text-4xl font-mono text-white break-all min-h-[2.5rem] md:min-h-[3.5rem] flex items-center justify-end">
                   {display}
+                </div>
+                {/* Fun calculation counter */}
+                <div className="text-xs text-gray-600 mt-2">
+                  {history.length > 0 && `${history.length} calculations done 🧮`}
                 </div>
               </div>
             </div>

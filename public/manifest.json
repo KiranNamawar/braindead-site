@@ -27,7 +27,12 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["utilities", "productivity", "tools", "lifestyle"],
+  "categories": [
+    "utilities",
+    "productivity",
+    "tools",
+    "lifestyle"
+  ],
   "lang": "en",
   "dir": "ltr",
   "scope": "/",
@@ -38,28 +43,48 @@
       "short_name": "Calc",
       "description": "Quick calculator tool",
       "url": "/calculator",
-      "icons": [{ "src": "/favicon.svg", "sizes": "32x32" }]
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32"
+        }
+      ]
     },
     {
       "name": "QR Generator",
       "short_name": "QR",
       "description": "Generate QR codes instantly",
       "url": "/qr-generator",
-      "icons": [{ "src": "/favicon.svg", "sizes": "32x32" }]
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32"
+        }
+      ]
     },
     {
       "name": "Password Generator",
       "short_name": "Password",
       "description": "Generate secure passwords",
       "url": "/password-generator",
-      "icons": [{ "src": "/favicon.svg", "sizes": "32x32" }]
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32"
+        }
+      ]
     },
     {
       "name": "Color Picker",
       "short_name": "Colors",
       "description": "Pick and convert colors",
       "url": "/color-picker",
-      "icons": [{ "src": "/favicon.svg", "sizes": "32x32" }]
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32"
+        }
+      ]
     }
   ],
   "screenshots": [
@@ -72,7 +97,11 @@
     }
   ],
   "prefer_related_applications": false,
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "edge_side_panel": {
     "preferred_width": 400
   }
