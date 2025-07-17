@@ -19,6 +19,12 @@ import TimestampConverterPage from './pages/TimestampConverterPage';
 import JSONFormatterPage from './pages/JSONFormatterPage';
 import RandomGeneratorPage from './pages/RandomGeneratorPage';
 import UnitConverterPage from './pages/UnitConverterPage';
+import TipCalculatorPage from './pages/TipCalculatorPage';
+import AgeCalculatorPage from './pages/AgeCalculatorPage';
+import BMICalculatorPage from './pages/BMICalculatorPage';
+import LoanCalculatorPage from './pages/LoanCalculatorPage';
+import PercentageCalculatorPage from './pages/PercentageCalculatorPage';
+import GradeCalculatorPage from './pages/GradeCalculatorPage';
 import Layout from './components/Layout';
 import SEOHead from './components/SEOHead';
 
@@ -64,6 +70,12 @@ function App() {
                 <Route path="/json-formatter" element={<JSONFormatterPage />} />
                 <Route path="/random-generator" element={<RandomGeneratorPage />} />
                 <Route path="/unit-converter" element={<UnitConverterPage />} />
+                <Route path="/tip-calculator" element={<TipCalculatorPage />} />
+                <Route path="/age-calculator" element={<AgeCalculatorPage />} />
+                <Route path="/bmi-calculator" element={<BMICalculatorPage />} />
+                <Route path="/loan-calculator" element={<LoanCalculatorPage />} />
+                <Route path="/percentage-calculator" element={<PercentageCalculatorPage />} />
+                <Route path="/grade-calculator" element={<GradeCalculatorPage />} />
               </Routes>
             </Layout>
             {/* PWA Components */}

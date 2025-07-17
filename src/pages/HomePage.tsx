@@ -156,6 +156,36 @@ const HomePage: React.FC = () => {
       path: '/unit-converter',
       features: ['Multiple categories', 'Precise calculations', 'History tracking', 'Quick presets'],
       quote: 'Converts units faster than you can Google "how many feet in a meter".'
+    },
+    {
+      id: 'tip-calculator',
+      name: 'Tip Calculator',
+      description: 'Calculate tips and split bills effortlessly. No more awkward math at restaurants or wondering if 18% is too much.',
+      icon: Calculator,
+      gradient: 'from-green-500 to-blue-600',
+      path: '/tip-calculator',
+      features: ['Bill splitting', 'Custom tip percentages', 'Currency formatting', 'History tracking'],
+      quote: 'Calculate tips without looking cheap or overpaying - napkin math is now obsolete.'
+    },
+    {
+      id: 'age-calculator',
+      name: 'Age Calculator',
+      description: 'Find out exactly how old you are (down to the minute). Because existential precision matters!',
+      icon: ClockIcon,
+      gradient: 'from-purple-500 to-pink-600',
+      path: '/age-calculator',
+      features: ['Precise age calculation', 'Leap year handling', 'Timezone support', 'Age comparisons'],
+      quote: 'Calculate your age with existential precision - because knowing you\'re exactly 10,957 days old hits different.'
+    },
+    {
+      id: 'grade-calculator',
+      name: 'Grade Calculator',
+      description: 'Calculate weighted grades, GPA, and predict what you need to achieve your target grade. Because academic anxiety needs numbers!',
+      icon: Calculator,
+      gradient: 'from-indigo-500 to-purple-600',
+      path: '/grade-calculator',
+      features: ['Weighted grade calculations', 'GPA conversion', 'Grade prediction', 'Custom grade scales'],
+      quote: 'Turn your academic stress into precise calculations - because knowing you need 97% on the final is somehow better than not knowing.'
     }
   ];
 
@@ -210,7 +240,7 @@ const HomePage: React.FC = () => {
               Premium utility tools for effortless productivity
             </p>
             <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              No thinking required, results guaranteed. 11 powerful tools designed for maximum efficiency.
+              No thinking required, results guaranteed. 13 powerful tools designed for maximum efficiency.
             </p>
           </div>
 
@@ -233,7 +263,8 @@ const HomePage: React.FC = () => {
             <div className="flex items-center space-x-6 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span>11 Premium Utility Tools</span>
+                <span>13 Premium Utility Tools</span>
+              
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
@@ -273,7 +304,7 @@ const HomePage: React.FC = () => {
               Choose Your <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Weapon</span>
             </h2>
             <p className="text-gray-400 text-lg">
-              11 powerful tools to make your life easier (and your brain lazier)
+              13 powerful tools to make your life easier (and your brain lazier)
             </p>
           </div>
 
@@ -396,7 +427,7 @@ const HomePage: React.FC = () => {
               </div>
               <div>
                 <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-2">
-                  11
+                  13
                 </div>
                 <div className="text-gray-400 text-sm">Premium Tools</div>
               </div>
