@@ -171,6 +171,16 @@ function initializeBackgroundSync(): void {
       registration.sync.register('analytics-sync').catch((error) => {
         console.warn('Background sync registration failed:', error);
       });
+      
+      // Register background sync for user preferences
+      registration.sync.register('preferences-sync').catch((error) => {
+        console.warn('Preferences sync registration failed:', error);
+      });
+      
+      // Register background sync for timer notifications
+      registration.sync.register('timer-notifications-sync').catch((error) => {
+        console.warn('Timer notifications sync registration failed:', error);
+      });
     });
   }
 }
@@ -254,3 +264,242 @@ export async function preloadCriticalResources(urls: string[]): Promise<void> {
 }
 
 export { updateAvailable, swRegistration };
+
+// Advanced PWA Features for Enhanced Service Worker
+
+// Schedule timer notification through service worker
+export async function scheduleTimerNotification(notificationData: {
+  type: string;
+  timerType: 'pomodoro' | 'timer' | 'countdown';
+  duration?: number;
+  customMessage?: string;
+}): Promise<void> {
+  if (!swRegistration?.active) {
+    console.warn('Service worker not available for timer notifications');
+    return;
+  }
+
+  try {
+    swRegistration.active.postMessage({
+      type: 'SCHEDULE_TIMER_NOTIFICATION',
+      notificationData
+    });
+    console.log('Timer notification scheduled:', notificationData.timerType);
+  } catch (error) {
+    console.error('Failed to schedule timer notification:', error);
+  }
+}
+
+// Sync user preferences through service worker
+export async function syncUserPreferences(preferences: any): Promise<void> {
+  if (!swRegistration?.active) {
+    console.warn('Service worker not available for preferences sync');
+    return;
+  }
+
+  try {
+    swRegistration.active.postMessage({
+      type: 'SYNC_USER_PREFERENCES',
+      preferences
+    });
+    console.log('User preferences queued for sync');
+  } catch (error) {
+    console.error('Failed to sync user preferences:', error);
+  }
+}
+
+// Track analytics through service worker
+export async function trackAnalytics(analyticsData: {
+  event: string;
+  toolId: string;
+  duration?: number;
+  timestamp?: number;
+  metadata?: any;
+}): Promise<void> {
+  if (!swRegistration?.active) {
+    console.warn('Service worker not available for analytics tracking');
+    return;
+  }
+
+  try {
+    const dataWithTimestamp = {
+      ...analyticsData,
+      timestamp: analyticsData.timestamp || Date.now()
+    };
+
+    swRegistration.active.postMessage({
+      type: 'TRACK_ANALYTICS',
+      analyticsData: dataWithTimestamp
+    });
+    console.log('Analytics data queued for processing');
+  } catch (error) {
+    console.error('Failed to track analytics:', error);
+  }
+}
+
+// Request notification permission
+export async function requestNotificationPermission(): Promise<NotificationPermission> {
+  if (!('Notification' in window)) {
+    console.warn('Notifications not supported');
+    return 'denied';
+  }
+
+  if (Notification.permission === 'granted') {
+    return 'granted';
+  }
+
+  if (Notification.permission === 'denied') {
+    return 'denied';
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    console.log('Notification permission:', permission);
+    return permission;
+  } catch (error) {
+    console.error('Failed to request notification permission:', error);
+    return 'denied';
+  }
+}
+
+// Check if notifications are supported and enabled
+export function getNotificationStatus(): {
+  supported: boolean;
+  permission: NotificationPermission;
+  enabled: boolean;
+} {
+  const supported = 'Notification' in window;
+  const permission = supported ? Notification.permission : 'denied';
+  const enabled = supported && permission === 'granted';
+
+  return { supported, permission, enabled };
+}
+
+// Get enhanced cache status with new cache types
+export async function getEnhancedCacheStatus(): Promise<{
+  caches: Record<string, { size: number; keys: string[] }>;
+  version: string;
+  totalSize: number;
+  features: string[];
+}> {
+  if (!swRegistration?.active) {
+    return { caches: {}, version: 'unknown', totalSize: 0, features: [] };
+  }
+
+  return new Promise((resolve) => {
+    const messageChannel = new MessageChannel();
+    messageChannel.port1.onmessage = (event) => {
+      resolve(event.data);
+    };
+
+    swRegistration!.active!.postMessage(
+      { type: 'GET_CACHE_STATUS' },
+      [messageChannel.port2]
+    );
+  });
+}
+
+// Clear specific cache through service worker
+export async function clearSpecificCache(cacheName: string): Promise<boolean> {
+  if (!swRegistration?.active) {
+    return false;
+  }
+
+  return new Promise((resolve) => {
+    const messageChannel = new MessageChannel();
+    messageChannel.port1.onmessage = (event) => {
+      resolve(event.data.success);
+    };
+
+    swRegistration!.active!.postMessage(
+      { type: 'CLEAR_CACHE', cacheName },
+      [messageChannel.port2]
+    );
+  });
+}
+
+// Listen for service worker messages
+export function setupServiceWorkerMessageListener(): void {
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    const { data } = event;
+    
+    switch (data?.type) {
+      case 'SW_UPDATED':
+        console.log('Service worker updated:', data.version);
+        window.dispatchEvent(new CustomEvent('sw-updated', {
+          detail: { version: data.version, features: data.features }
+        }));
+        break;
+        
+      case 'OFFLINE_SYNC_SUCCESS':
+        console.log('Offline sync successful:', data.request);
+        window.dispatchEvent(new CustomEvent('offline-sync-success', {
+          detail: { request: data.request }
+        }));
+        break;
+        
+      case 'PREFERENCES_SYNC_SUCCESS':
+        console.log('Preferences sync successful');
+        window.dispatchEvent(new CustomEvent('preferences-sync-success', {
+          detail: { data: data.data }
+        }));
+        break;
+        
+      case 'ANALYTICS_SYNC_SUCCESS':
+        console.log('Analytics sync successful');
+        window.dispatchEvent(new CustomEvent('analytics-sync-success', {
+          detail: { data: data.data }
+        }));
+        break;
+        
+      case 'NOTIFICATION_CLICK':
+        console.log('Notification clicked:', data.action, data.timerType);
+        window.dispatchEvent(new CustomEvent('notification-click', {
+          detail: { action: data.action, timerType: data.timerType, url: data.url }
+        }));
+        break;
+        
+      default:
+        console.log('Unknown service worker message:', data?.type);
+    }
+  });
+}
+
+// Initialize enhanced PWA features
+export function initializeEnhancedPWA(): void {
+  // Initialize basic PWA features
+  initializePWA();
+  
+  // Setup service worker message listener
+  setupServiceWorkerMessageListener();
+  
+  // Request notification permission if not already granted
+  if (getNotificationStatus().supported && getNotificationStatus().permission === 'default') {
+    // Don't request immediately, let the user interact first
+    console.log('Notification permission available to request');
+  }
+}
+
+// Utility function to check if advanced PWA features are available
+export function getAdvancedPWACapabilities(): {
+  backgroundSync: boolean;
+  notifications: boolean;
+  offlineFirst: boolean;
+  advancedCaching: boolean;
+} {
+  const hasServiceWorker = 'serviceWorker' in navigator;
+  const hasBackgroundSync = hasServiceWorker && 'sync' in window.ServiceWorkerRegistration.prototype;
+  const hasNotifications = 'Notification' in window;
+  const hasCaches = 'caches' in window;
+
+  return {
+    backgroundSync: hasBackgroundSync,
+    notifications: hasNotifications,
+    offlineFirst: hasServiceWorker && hasCaches,
+    advancedCaching: hasCaches
+  };
+}

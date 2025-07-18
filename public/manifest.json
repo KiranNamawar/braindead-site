@@ -41,24 +41,26 @@
     {
       "name": "Calculator",
       "short_name": "Calc",
-      "description": "Quick calculator tool",
+      "description": "Quick calculator for basic math",
       "url": "/calculator",
       "icons": [
         {
           "src": "/favicon.svg",
-          "sizes": "32x32"
+          "sizes": "32x32",
+          "type": "image/svg+xml"
         }
       ]
     },
     {
-      "name": "QR Generator",
-      "short_name": "QR",
-      "description": "Generate QR codes instantly",
-      "url": "/qr-generator",
+      "name": "Pomodoro Timer",
+      "short_name": "Pomodoro",
+      "description": "Focus timer for productivity",
+      "url": "/pomodoro-timer",
       "icons": [
         {
           "src": "/favicon.svg",
-          "sizes": "32x32"
+          "sizes": "32x32",
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -70,7 +72,21 @@
       "icons": [
         {
           "src": "/favicon.svg",
-          "sizes": "32x32"
+          "sizes": "32x32",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "QR Generator",
+      "short_name": "QR",
+      "description": "Generate QR codes instantly",
+      "url": "/qr-generator",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32",
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -82,7 +98,47 @@
       "icons": [
         {
           "src": "/favicon.svg",
-          "sizes": "32x32"
+          "sizes": "32x32",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Text Tools",
+      "short_name": "Text",
+      "description": "Word counter and text analysis",
+      "url": "/word-counter",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Base64 Encoder",
+      "short_name": "Base64",
+      "description": "Encode and decode Base64",
+      "url": "/base64-encoder",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "JSON Formatter",
+      "short_name": "JSON",
+      "description": "Format and validate JSON",
+      "url": "/json-formatter",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32",
+          "type": "image/svg+xml"
         }
       ]
     }
@@ -104,5 +160,38 @@
   ],
   "edge_side_panel": {
     "preferred_width": 400
-  }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+braindead",
+      "url": "/?tool=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/json-formatter",
+      "accept": {
+        "application/json": [".json"]
+      }
+    },
+    {
+      "action": "/markdown-editor",
+      "accept": {
+        "text/markdown": [".md", ".markdown"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "handle_links": "preferred"
 }

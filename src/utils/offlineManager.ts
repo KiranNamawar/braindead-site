@@ -210,7 +210,7 @@ class OfflineManager {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
           this.serviceWorkerRegistration = registration;
-          console.log('Service Worker registered successfully');
+          console.log('Enhanced Service Worker registered successfully');
           
           // Listen for service worker messages
           navigator.serviceWorker.addEventListener('message', this.handleServiceWorkerMessage.bind(this));
@@ -226,6 +226,9 @@ class OfflineManager {
               });
             }
           });
+          
+          // Initialize background sync for enhanced features
+          this.initializeEnhancedBackgroundSync();
         })
         .catch((error) => {
           console.warn('Service Worker registration failed:', error);
@@ -536,6 +539,97 @@ class OfflineManager {
   public clearOfflineQueue(): void {
     this.offlineQueue = [];
     this.saveOfflineQueue();
+  }
+
+  // Initialize enhanced background sync features
+  private initializeEnhancedBackgroundSync(): void {
+    if (!this.serviceWorkerRegistration || !('sync' in window.ServiceWorkerRegistration.prototype)) {
+      console.warn('Background sync not supported');
+      return;
+    }
+
+    // Register background sync for different data types
+    this.serviceWorkerRegistration.sync.register('preferences-sync').catch(error => {
+      console.warn('Failed to register preferences sync:', error);
+    });
+
+    this.serviceWorkerRegistration.sync.register('analytics-sync').catch(error => {
+      console.warn('Failed to register analytics sync:', error);
+    });
+
+    this.serviceWorkerRegistration.sync.register('timer-notifications-sync').catch(error => {
+      console.warn('Failed to register timer notifications sync:', error);
+    });
+
+    console.log('Enhanced background sync initialized');
+  }
+
+  // Enhanced methods for service worker communication
+  public async scheduleTimerNotification(notificationData: {
+    type: string;
+    timerType: 'pomodoro' | 'timer' | 'countdown';
+    duration?: number;
+    customMessage?: string;
+  }): Promise<void> {
+    if (!this.serviceWorkerRegistration?.active) {
+      console.warn('Service worker not available for timer notifications');
+      return;
+    }
+
+    try {
+      this.serviceWorkerRegistration.active.postMessage({
+        type: 'SCHEDULE_TIMER_NOTIFICATION',
+        notificationData
+      });
+      console.log('Timer notification scheduled:', notificationData.timerType);
+    } catch (error) {
+      console.error('Failed to schedule timer notification:', error);
+    }
+  }
+
+  public async syncUserPreferences(preferences: any): Promise<void> {
+    if (!this.serviceWorkerRegistration?.active) {
+      console.warn('Service worker not available for preferences sync');
+      return;
+    }
+
+    try {
+      this.serviceWorkerRegistration.active.postMessage({
+        type: 'SYNC_USER_PREFERENCES',
+        preferences
+      });
+      console.log('User preferences queued for sync');
+    } catch (error) {
+      console.error('Failed to sync user preferences:', error);
+    }
+  }
+
+  public async trackAnalytics(analyticsData: {
+    event: string;
+    toolId: string;
+    duration?: number;
+    timestamp?: number;
+    metadata?: any;
+  }): Promise<void> {
+    if (!this.serviceWorkerRegistration?.active) {
+      console.warn('Service worker not available for analytics tracking');
+      return;
+    }
+
+    try {
+      const dataWithTimestamp = {
+        ...analyticsData,
+        timestamp: analyticsData.timestamp || Date.now()
+      };
+
+      this.serviceWorkerRegistration.active.postMessage({
+        type: 'TRACK_ANALYTICS',
+        analyticsData: dataWithTimestamp
+      });
+      console.log('Analytics data queued for processing');
+    } catch (error) {
+      console.error('Failed to track analytics:', error);
+    }
   }
 
   // Service worker update management
