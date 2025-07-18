@@ -1,5 +1,15 @@
 // Enhanced input validation utilities with comprehensive error handling
 import { LIMITS } from './constants';
+import { 
+  sanitizeText, 
+  sanitizeHtml, 
+  sanitizeMarkdown, 
+  sanitizeCss, 
+  sanitizeJson,
+  escapeHtml,
+  validateInput,
+  VALIDATION_PATTERNS
+} from './security';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -45,9 +55,7 @@ export const validateNumber = (value: string, min?: number, max?: number): boole
 };
 
 export const sanitizeInput = (input: string): string => {
-  return input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-              .replace(/javascript:/gi, '')
-              .replace(/on\w+\s*=/gi, '');
+  return sanitizeText(input);
 };
 
 export const validateJSON = (jsonString: string): { isValid: boolean; error?: string } => {
@@ -462,21 +470,13 @@ export const validateCSS = (input: string): ValidationResult => {
   return { isValid: true, warnings, suggestions };
 };
 
-// Enhanced sanitization
+// Enhanced sanitization using security utilities
 export const sanitizeHTML = (input: string): string => {
-  const div = document.createElement('div');
-  div.textContent = input;
-  return div.innerHTML;
+  return sanitizeHtml(input);
 };
 
 export const sanitizeInputEnhanced = (input: string): string => {
-  return input
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/javascript:/gi, '')
-    .replace(/on\w+\s*=/gi, '')
-    .replace(/data:text\/html/gi, '')
-    .replace(/vbscript:/gi, '')
-    .trim();
+  return sanitizeText(input);
 };
 
 // Generic validator with options

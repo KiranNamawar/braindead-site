@@ -55,6 +55,10 @@ export default defineConfig({
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=(), usb=()',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'X-Permitted-Cross-Domain-Policies': 'none',
     },
   },
   preview: {
@@ -64,6 +68,10 @@ export default defineConfig({
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=(), usb=()',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'X-Permitted-Cross-Domain-Policies': 'none',
     },
   },
 });

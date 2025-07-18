@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { trackPageView } from './utils/analytics';
@@ -9,6 +9,10 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
 import PWAUpdateNotification from './components/PWAUpdateNotification';
 import AccessibilityEnhancements from './components/shared/AccessibilityEnhancements';
+import PrivacyNotice from './components/PrivacyNotice';
+import PrivacyDashboard from './components/PrivacyDashboard';
+import PrivacyIndicator from './components/PrivacyIndicator';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import HomePage from './pages/HomePage';
 import CalculatorPage from './pages/CalculatorPage';
 import ColorPickerPage from './pages/ColorPickerPage';
@@ -63,6 +67,8 @@ const ScrollToTop: React.FC = () => {
 };
 
 function App() {
+  const [isPrivacyDashboardOpen, setIsPrivacyDashboardOpen] = useState(false);
+
   React.useEffect(() => {
     info('Application started', { 
       version: import.meta.env.VITE_APP_VERSION || '1.0.0',
@@ -117,12 +123,21 @@ function App() {
                   <Route path="/jwt-decoder" element={<JWTDecoderPage />} />
                   <Route path="/number-converter" element={<NumberConverterPage />} />
                   <Route path="/roman-numeral" element={<RomanNumeralPage />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 </Routes>
               </Layout>
               {/* PWA Components */}
               <OfflineIndicator />
               <PWAInstallPrompt />
               <PWAUpdateNotification />
+              
+              {/* Privacy Components */}
+              <PrivacyNotice onOpenDashboard={() => setIsPrivacyDashboardOpen(true)} />
+              <PrivacyIndicator onOpenDashboard={() => setIsPrivacyDashboardOpen(true)} />
+              <PrivacyDashboard 
+                isOpen={isPrivacyDashboardOpen} 
+                onClose={() => setIsPrivacyDashboardOpen(false)} 
+              />
             </Router>
           </AccessibilityEnhancements>
         </ToastProvider>

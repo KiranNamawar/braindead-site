@@ -90,8 +90,8 @@ function notifyUpdateAvailable(): void {
 // Check if app is running as PWA
 export function isPWA(): boolean {
   return window.matchMedia('(display-mode: standalone)').matches ||
-         (window.navigator as any).standalone === true ||
-         document.referrer.includes('android-app://');
+    (window.navigator as any).standalone === true ||
+    document.referrer.includes('android-app://');
 }
 
 // Get PWA installation status
@@ -129,7 +129,7 @@ function handleAppInstallation(): void {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    
+
     // Dispatch event for install prompt component
     window.dispatchEvent(new CustomEvent('pwa-install-available', {
       detail: { prompt: deferredPrompt }
@@ -139,10 +139,10 @@ function handleAppInstallation(): void {
   window.addEventListener('appinstalled', () => {
     console.log('PWA was installed');
     deferredPrompt = null;
-    
+
     // Track installation
     trackPWAInstallation();
-    
+
     // Dispatch event
     window.dispatchEvent(new CustomEvent('pwa-installed'));
   });
@@ -171,12 +171,12 @@ function initializeBackgroundSync(): void {
       registration.sync.register('analytics-sync').catch((error) => {
         console.warn('Background sync registration failed:', error);
       });
-      
+
       // Register background sync for user preferences
       registration.sync.register('preferences-sync').catch((error) => {
         console.warn('Preferences sync registration failed:', error);
       });
-      
+
       // Register background sync for timer notifications
       registration.sync.register('timer-notifications-sync').catch((error) => {
         console.warn('Timer notifications sync registration failed:', error);
@@ -426,7 +426,7 @@ export function setupServiceWorkerMessageListener(): void {
 
   navigator.serviceWorker.addEventListener('message', (event) => {
     const { data } = event;
-    
+
     switch (data?.type) {
       case 'SW_UPDATED':
         console.log('Service worker updated:', data.version);
@@ -434,35 +434,35 @@ export function setupServiceWorkerMessageListener(): void {
           detail: { version: data.version, features: data.features }
         }));
         break;
-        
+
       case 'OFFLINE_SYNC_SUCCESS':
         console.log('Offline sync successful:', data.request);
         window.dispatchEvent(new CustomEvent('offline-sync-success', {
           detail: { request: data.request }
         }));
         break;
-        
+
       case 'PREFERENCES_SYNC_SUCCESS':
         console.log('Preferences sync successful');
         window.dispatchEvent(new CustomEvent('preferences-sync-success', {
           detail: { data: data.data }
         }));
         break;
-        
+
       case 'ANALYTICS_SYNC_SUCCESS':
         console.log('Analytics sync successful');
         window.dispatchEvent(new CustomEvent('analytics-sync-success', {
           detail: { data: data.data }
         }));
         break;
-        
+
       case 'NOTIFICATION_CLICK':
         console.log('Notification clicked:', data.action, data.timerType);
         window.dispatchEvent(new CustomEvent('notification-click', {
           detail: { action: data.action, timerType: data.timerType, url: data.url }
         }));
         break;
-        
+
       default:
         console.log('Unknown service worker message:', data?.type);
     }
@@ -473,10 +473,10 @@ export function setupServiceWorkerMessageListener(): void {
 export function initializeEnhancedPWA(): void {
   // Initialize basic PWA features
   initializePWA();
-  
+
   // Setup service worker message listener
   setupServiceWorkerMessageListener();
-  
+
   // Request notification permission if not already granted
   if (getNotificationStatus().supported && getNotificationStatus().permission === 'default') {
     // Don't request immediately, let the user interact first

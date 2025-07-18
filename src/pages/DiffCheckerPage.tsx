@@ -5,6 +5,7 @@ import { useToast } from '../components/ToastContainer';
 import SEOHead from '../components/SEOHead';
 import BackButton from '../components/BackButton';
 import { LIMITS } from '../utils/constants';
+import { sanitizeText } from '../utils/security';
 
 interface DiffLine {
   type: 'added' | 'removed' | 'unchanged' | 'modified';
@@ -392,7 +393,7 @@ ${lineDiff.map(line => {
           <h3 className="text-xl font-bold text-white mb-6">Original Text</h3>
           <textarea
             value={originalText}
-            onChange={(e) => setOriginalText(e.target.value)}
+            onChange={(e) => setOriginalText(sanitizeText(e.target.value))}
             placeholder="Paste your original text here..."
             className="w-full h-64 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white resize-none focus:border-orange-500 focus:outline-none text-sm font-mono"
             maxLength={LIMITS.maxTextLength}
@@ -414,7 +415,7 @@ ${lineDiff.map(line => {
           <h3 className="text-xl font-bold text-white mb-6">Modified Text</h3>
           <textarea
             value={modifiedText}
-            onChange={(e) => setModifiedText(e.target.value)}
+            onChange={(e) => setModifiedText(sanitizeText(e.target.value))}
             placeholder="Paste your modified text here..."
             className="w-full h-64 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white resize-none focus:border-orange-500 focus:outline-none text-sm font-mono"
             maxLength={LIMITS.maxTextLength}

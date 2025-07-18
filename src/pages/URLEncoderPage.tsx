@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Link2, Copy, Upload, Download, Globe, CheckCircle, XCircle, RotateCcw, Eye } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import { LIMITS } from '../utils/constants';
+import { sanitizeText, sanitizeUrl } from '../utils/security';
 
 interface URLComponents {
   protocol?: string;
@@ -322,7 +323,7 @@ const URLEncoderPage: React.FC = () => {
 
               <textarea
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={(e) => setInputText(sanitizeText(e.target.value))}
                 placeholder={
                   mode === 'encode' 
                     ? 'Enter text or URL to encode...' 

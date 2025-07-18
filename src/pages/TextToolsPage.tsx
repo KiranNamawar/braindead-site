@@ -5,7 +5,7 @@ import { useToast } from '../components/ToastContainer';
 import SEOHead from '../components/SEOHead';
 import BackButton from '../components/BackButton';
 import { LIMITS } from '../utils/constants';
-import { sanitizeInput } from '../utils/validation';
+import { sanitizeText, validateInput, VALIDATION_PATTERNS } from '../utils/security';
 
 const TextToolsPage: React.FC = () => {
   const [inputText, setInputText] = useState('');
@@ -66,14 +66,16 @@ const TextToolsPage: React.FC = () => {
         break;
       }
       case 'extractEmails': {
+        const sanitizedText = sanitizeText(inputText);
         const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
-        const emails = sanitizeInput(inputText).match(emailRegex) || [];
+        const emails = sanitizedText.match(emailRegex) || [];
         result = emails.join('\n');
         break;
       }
       case 'extractUrls': {
+        const sanitizedText = sanitizeText(inputText);
         const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
-        const urls = sanitizeInput(inputText).match(urlRegex) || [];
+        const urls = sanitizedText.match(urlRegex) || [];
         result = urls.join('\n');
         break;
       }

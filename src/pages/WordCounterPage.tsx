@@ -5,6 +5,7 @@ import { useToast } from '../components/ToastContainer';
 import SEOHead from '../components/SEOHead';
 import BackButton from '../components/BackButton';
 import { LIMITS } from '../utils/constants';
+import { sanitizeText } from '../utils/security';
 
 interface TextStats {
   words: number;
@@ -174,7 +175,7 @@ ${keywordDensity.slice(0, 10).map((kw, i) => `${i + 1}. ${kw.word} (${kw.count} 
             <h3 className="text-xl font-bold text-white mb-6">Input Text</h3>
             <textarea
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={(e) => setInputText(sanitizeText(e.target.value))}
               placeholder="Paste or type your text here to analyze..."
               className="w-full h-80 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white resize-none focus:border-blue-500 focus:outline-none text-sm md:text-base"
               maxLength={LIMITS.maxTextLength}

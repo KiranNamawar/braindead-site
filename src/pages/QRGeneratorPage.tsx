@@ -8,6 +8,7 @@ import { checkRateLimit, qrGeneratorLimiter } from '../utils/rateLimiter';
 import SEOHead from '../components/SEOHead';
 import BackButton from '../components/BackButton';
 import { STORAGE_KEYS, LIMITS } from '../utils/constants';
+import { sanitizeText } from '../utils/security';
 
 const QRGeneratorPage: React.FC = () => {
   const [text, setText] = useState('https://braindead.site');
@@ -155,7 +156,7 @@ const QRGeneratorPage: React.FC = () => {
                 <label className="block text-gray-400 text-sm mb-2">Text or URL</label>
                 <textarea
                   value={text}
-                  onChange={(e) => setText(e.target.value)}
+                  onChange={(e) => setText(sanitizeText(e.target.value))}
                   placeholder="Enter text, URL, or any content..."
                   className="w-full h-32 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white resize-none focus:border-emerald-500 focus:outline-none"
                 />

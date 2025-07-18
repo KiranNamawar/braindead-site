@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { FileText, Copy, Upload, Download, Eye, EyeOff, Split, Maximize2, Type, Bold, Italic, Link, List, ListOrdered, Quote, Code, Image } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import { LIMITS } from '../utils/constants';
+import { sanitizeMarkdown, validateFileContent } from '../utils/security';
 import { marked } from 'marked';
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -64,7 +65,9 @@ const MarkdownEditorPage: React.FC = () => {
     }
 
     try {
-      const parsedHtml = await marked.parse(markdown);
+      // Sanitize markdown input to prevent XSS
+      const sanitizedMarkdown = sanitizeMarkdown(markdown);
+      const parsedHtml = await marked.parse(sanitizedMarkdown);
       setHtml(parsedHtml);
       setError('');
     } catch (err) {
@@ -95,7 +98,17 @@ const MarkdownEditorPage: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      setMarkdown(content);
+      
+      // Validate file content for security
+      const validation = validateFileContent(content, LIMITS.maxTextLength);
+      if (!validation.isValid) {
+        setError(validation.error || 'Invalid file content');
+        return;
+      }
+      
+      // Sanitize the content before setting
+      const sanitizedContent = sanitizeMarkdown(content);
+      setMarkdown(sanitizedContent);
     };
     reader.readAsText(file);
   }, []);
