@@ -4,6 +4,7 @@ import ToolLayout from '../components/shared/ToolLayout';
 import { validateJSONEnhanced, ValidationResult } from '../utils/validation';
 import { LIMITS } from '../utils/constants';
 import { useToast } from '../components/ToastContainer';
+import { getSharedData } from '../utils/toolIntegration';
 
 const JSONFormatterPage: React.FC = () => {
   const { showSuccess, showError, showWarning } = useToast();
@@ -15,6 +16,16 @@ const JSONFormatterPage: React.FC = () => {
 
   // Check for integration data on mount
   useEffect(() => {
+    // Check for shared clipboard data
+    const sharedData = getSharedData();
+    if (sharedData && sharedData.dataType === 'json' || sharedData?.dataType === 'text') {
+      if (typeof sharedData.data === 'string') {
+        setInputJson(sharedData.data);
+        showSuccess(`Data loaded from ${sharedData.sourceToolId}`);
+      }
+    }
+
+    // Legacy integration support
     const integrationData = sessionStorage.getItem('tool-integration-json-formatter');
     if (integrationData) {
       try {
@@ -169,6 +180,23 @@ const JSONFormatterPage: React.FC = () => {
     }
   };
 
+  const handleSharedDataLoaded = (data: any, configuration: any) => {
+    if (data && typeof data === 'string') {
+      setInputJson(data);
+    }
+    
+    if (configuration) {
+      if (configuration.operation) {
+        setOperation(configuration.operation);
+      }
+      if (configuration.indentSize) {
+        setIndentSize(configuration.indentSize);
+      }
+    }
+    
+    showSuccess('Configuration and data loaded from shared link');
+  };
+
   return (
     <ToolLayout
       toolId="json-formatter"
@@ -177,6 +205,7 @@ const JSONFormatterPage: React.FC = () => {
       outputData={outputJson}
       onExport={handleExport}
       onBatchProcess={handleBatchProcess}
+      onSharedDataLoaded={handleSharedDataLoaded}
       batchInputPlaceholder="Enter JSON strings, one per line"
       showBatchOperations={true}
     >

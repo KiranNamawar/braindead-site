@@ -11,6 +11,14 @@ import SharedClipboard from './SharedClipboard';
 import ToolIntegrationPanel from './ToolIntegrationPanel';
 import ExportButton from './ExportButton';
 import BatchOperationPanel from './BatchOperationPanel';
+import ExportPanel from './ExportPanel';
+import BatchProcessor from './BatchProcessor';
+import ToolIntegration from './ToolIntegration';
+import ShareableLinkHandler from './ShareableLinkHandler';
+import ToolTutorial from './ToolTutorial';
+import ContextualHelp from './ContextualHelp';
+import KeyboardShortcuts from './KeyboardShortcuts';
+import ToolRecommendations from './ToolRecommendations';
 import SEOHead from '../SEOHead';
 import Breadcrumbs from '../Breadcrumbs';
 import { useToast } from '../ToastContainer';
@@ -24,6 +32,7 @@ interface ToolLayoutProps {
   outputData?: any;
   onExport?: (format: string) => void;
   onBatchProcess?: (input: any) => Promise<any>;
+  onSharedDataLoaded?: (data: any, configuration: any) => void;
   batchInputPlaceholder?: string;
   showSharedClipboard?: boolean;
   showIntegrationPanel?: boolean;
@@ -40,6 +49,7 @@ const ToolLayout: React.FC<ToolLayoutProps> = ({
   outputData,
   onExport,
   onBatchProcess,
+  onSharedDataLoaded,
   batchInputPlaceholder,
   showSharedClipboard = true,
   showIntegrationPanel = true,
@@ -204,6 +214,14 @@ const ToolLayout: React.FC<ToolLayoutProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
+            {/* Shareable Link Handler */}
+            <ShareableLinkHandler
+              toolId={toolId}
+              onDataLoaded={onSharedDataLoaded || ((data, config) => {
+                console.log('Shared data loaded:', { data, config });
+              })}
+            />
+
             {/* Shared Clipboard */}
             {showSharedClipboard && (
               <SharedClipboard
@@ -217,18 +235,131 @@ const ToolLayout: React.FC<ToolLayoutProps> = ({
               {children}
             </div>
 
-            {/* Batch Operations */}
-            {showBatchOperations && onBatchProcess && (
-              <BatchOperationPanel
+            {/* Advanced Export Panel */}
+            {outputData && (
+              <ExportPanel
                 toolId={toolId}
-                onBatchProcess={onBatchProcess}
-                inputPlaceholder={batchInputPlaceholder}
+                data={outputData}
+                toolName={title}
+                onExport={onExport}
+                className="mb-6"
+              />
+            )}
+
+            {/* Tool Integration */}
+            <ToolIntegration
+              toolId={toolId}
+              outputData={outputData}
+              onIntegrate={handleIntegrateData}
+              className="mb-6"
+            />
+
+            {/* Advanced Batch Processing */}
+            {showBatchOperations && onBatchProcess && (
+              <BatchProcessor
+                toolId={toolId}
+                toolName={title}
+                processor={onBatchProcess}
+                placeholder={batchInputPlaceholder}
+                className="mb-6"
               />
             )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Tutorial and Help */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+              <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
+                Help & Shortcuts
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                <ToolTutorial
+                  toolId={toolId}
+                  steps={[
+                    {
+                      id: 'intro',
+                      title: 'Welcome!',
+                      description: `Learn how to use ${title} effectively`,
+                      content: (
+                        <div>
+                          <p>This tutorial will guide you through the main features of this tool.</p>
+                          <p className="mt-2 text-sm text-gray-600">
+                            You can always replay this tutorial from the help section.
+                          </p>
+                        </div>
+                      )
+                    },
+                    {
+                      id: 'main-features',
+                      title: 'Main Features',
+                      description: 'Discover what this tool can do',
+                      content: (
+                        <div>
+                          <p>Key features:</p>
+                          <ul className="mt-2 space-y-1">
+                            {tool?.features.slice(0, 3).map((feature, index) => (
+                              <li key={index} className="text-sm flex items-start gap-2">
+                                <span className="w-1 h-1 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )
+                    },
+                    {
+                      id: 'shortcuts',
+                      title: 'Keyboard Shortcuts',
+                      description: 'Work faster with keyboard shortcuts',
+                      content: (
+                        <div>
+                          <p>Use these shortcuts to work more efficiently:</p>
+                          <div className="mt-2 space-y-1 text-sm">
+                            <div>• <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl+Enter</kbd> - Execute</div>
+                            <div>• <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl+S</kbd> - Save/Export</div>
+                            <div>• <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl+R</kbd> - Reset</div>
+                          </div>
+                        </div>
+                      )
+                    }
+                  ]}
+                  autoStart={false}
+                />
+                
+                <KeyboardShortcuts
+                  toolId={toolId}
+                  onShortcutTriggered={(action) => {
+                    // Handle shortcut actions
+                    switch (action) {
+                      case 'help':
+                        // Trigger tutorial
+                        break;
+                      case 'export':
+                        if (outputData && onExport) {
+                          onExport('json');
+                        }
+                        break;
+                      case 'save':
+                        if (outputData && onExport) {
+                          onExport('json');
+                        }
+                        break;
+                      default:
+                        console.log('Shortcut triggered:', action);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Tool Recommendations */}
+            <ToolRecommendations
+              currentToolId={toolId}
+              limit={3}
+              showComparison={true}
+            />
+
             {/* Tool Integration Panel */}
             {showIntegrationPanel && (
               <ToolIntegrationPanel
