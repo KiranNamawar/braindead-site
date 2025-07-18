@@ -6,6 +6,7 @@ import { trackToolUsage } from '../utils/analytics';
 import SEOHead from '../components/SEOHead';
 import BackButton from '../components/BackButton';
 import { STORAGE_KEYS } from '../utils/constants';
+import SEOContent from '../components/SEOContent';
 
 interface TipCalculation {
   billAmount: number;
@@ -406,6 +407,9 @@ const TipCalculatorPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* SEO Content Section */}
+      <SEOContent type="tool" toolId="tip-calculator" />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { useToast } from '../components/ToastContainer';
 import { trackToolUsage } from '../utils/analytics';
 import { STORAGE_KEYS } from '../utils/constants';
 import { validateNumberEnhanced } from '../utils/validation';
+import SEOContent from '../components/SEOContent';
 
 interface CalculationHistory {
   expression: string;
@@ -583,6 +584,9 @@ const CalculatorPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* SEO Content Section */}
+      <SEOContent type="tool" toolId="calculator" />
     </ToolLayout>
   );
 };

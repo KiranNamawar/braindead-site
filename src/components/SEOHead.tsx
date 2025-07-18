@@ -1,6 +1,23 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
 import { APP_CONFIG } from '../utils/constants';
+import { 
+  generateToolSEO, 
+  generateHomepageSEO, 
+  generateBreadcrumbStructuredData,
+  generateToolFAQStructuredData,
+  generateOrganizationStructuredData,
+  SEOData 
+} from '../utils/seo';
+import { 
+  generateToolMetaTags, 
+  generateHomepageMetaTags, 
+  generateCategoryMetaTags,
+  MetaTags 
+} from '../utils/seoMetaTags';
+import { ToolCategory } from '../types';
+import { getAllTools } from '../utils/toolRegistry';
 
 interface SEOHeadProps {
   title?: string;
@@ -8,64 +25,81 @@ interface SEOHeadProps {
   canonical?: string;
   image?: string;
   type?: string;
-  keywords?: string;
+  keywords?: string | string[];
   noIndex?: boolean;
+  toolId?: string;
+  customSEOData?: Partial<SEOData>;
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
   title,
-  description = APP_CONFIG.description,
+  description,
   canonical,
-  image = '/og-image.jpg',
+  image,
   type = 'website',
-  keywords = 'utility tools, calculator, color picker, QR generator, password generator, text tools, hash generator, JSON formatter, unit converter, timestamp converter, image optimizer, random generator',
-  noIndex = false
+  keywords,
+  noIndex = false,
+  toolId,
+  customSEOData
 }) => {
-  const siteTitle = `${APP_CONFIG.name} - Premium Utility Tools for Effortless Productivity`;
-  const fullTitle = title ? `${title} | ${APP_CONFIG.name}` : siteTitle;
-  const fullCanonical = canonical ? `${APP_CONFIG.url}${canonical}` : APP_CONFIG.url;
-  const fullImage = image.startsWith('http') ? image : `${APP_CONFIG.url}${image}`;
-
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: APP_CONFIG.name,
-    description,
-    url: APP_CONFIG.url,
-    applicationCategory: 'UtilityApplication',
-    operatingSystem: 'Web Browser',
-    browserRequirements: 'Requires JavaScript. Requires HTML5.',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD'
-    },
-    creator: {
-      '@type': 'Organization',
-      name: APP_CONFIG.author,
-      url: APP_CONFIG.url
-    },
-    featureList: [
-      'Calculator with history',
-      'Color picker and palette generator',
-      'QR code generator',
-      'Text transformation tools',
-      'Password generator',
-      'Hash generator',
-      'Image optimizer',
-      'Timestamp converter',
-      'JSON formatter',
-      'Random data generator',
-      'Unit converter'
-    ]
-  };
+  const location = useLocation();
+  const allTools = getAllTools();
+  
+  // Generate comprehensive meta tags based on context
+  let metaTags: MetaTags;
+  let seoData: SEOData;
+  
+  if (toolId) {
+    // Tool-specific SEO
+    metaTags = generateToolMetaTags(toolId);
+    const tool = allTools.find(t => t.id === toolId);
+    if (tool) {
+      seoData = generateToolSEO(tool);
+    } else {
+      seoData = generateHomepageSEO();
+    }
+  } else if (location.pathname === '/') {
+    // Homepage SEO
+    metaTags = generateHomepageMetaTags();
+    seoData = generateHomepageSEO();
+  } else {
+    // Try to detect tool from path
+    const pathTool = allTools.find(t => t.path === location.pathname);
+    if (pathTool) {
+      metaTags = generateToolMetaTags(pathTool.id);
+      seoData = generateToolSEO(pathTool);
+    } else {
+      metaTags = generateHomepageMetaTags();
+      seoData = generateHomepageSEO();
+    }
+  }
+  
+  // Override with custom data if provided
+  if (customSEOData) {
+    seoData = { ...seoData, ...customSEOData };
+  }
+  
+  // Override with props if provided (prioritize new meta tags system)
+  const finalTitle = title || metaTags.title;
+  const finalDescription = description || metaTags.description;
+  const finalCanonical = canonical ? `${APP_CONFIG.url}${canonical}` : metaTags.canonicalUrl;
+  const finalImage = image ? (image.startsWith('http') ? image : `${APP_CONFIG.url}${image}`) : metaTags.ogImage || seoData.image;
+  const finalKeywords = Array.isArray(keywords) ? keywords.join(', ') : keywords || metaTags.keywords;
+  
+  // Generate additional structured data
+  const breadcrumbData = seoData.breadcrumbs ? generateBreadcrumbStructuredData(seoData.breadcrumbs) : null;
+  const organizationData = generateOrganizationStructuredData();
+  
+  // Generate FAQ data for tools
+  const tool = toolId ? allTools.find(t => t.id === toolId) : null;
+  const faqData = tool ? generateToolFAQStructuredData(tool) : null;
 
   return (
     <Helmet>
       {/* Basic Meta Tags */}
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
+      <title>{finalTitle}</title>
+      <meta name="description" content={finalDescription} />
+      <meta name="keywords" content={finalKeywords} />
       <meta name="author" content={APP_CONFIG.author} />
       <meta name="version" content={APP_CONFIG.version} />
       
@@ -73,34 +107,53 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <meta name="robots" content={noIndex ? 'noindex, nofollow' : 'index, follow'} />
       
       {/* Canonical URL */}
-      <link rel="canonical" href={fullCanonical} />
+      <link rel="canonical" href={finalCanonical} />
 
       {/* Open Graph */}
-      <meta property="og:type" content={type} />
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImage} />
-      <meta property="og:url" content={fullCanonical} />
+      <meta property="og:type" content={seoData.type} />
+      <meta property="og:title" content={finalTitle} />
+      <meta property="og:description" content={finalDescription} />
+      <meta property="og:image" content={finalImage} />
+      <meta property="og:url" content={finalCanonical} />
       <meta property="og:site_name" content={APP_CONFIG.name} />
       <meta property="og:locale" content="en_US" />
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={fullImage} />
+      <meta name="twitter:title" content={finalTitle} />
+      <meta name="twitter:description" content={finalDescription} />
+      <meta name="twitter:image" content={finalImage} />
 
       {/* Additional Meta Tags */}
-      <meta name="theme-color" content="#1f2937" />
-      <meta name="msapplication-TileColor" content="#1f2937" />
+      <meta name="theme-color" content="#3b82f6" />
+      <meta name="msapplication-TileColor" content="#3b82f6" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta name="format-detection" content="telephone=no" />
 
-      {/* Structured Data */}
+      {/* Main Structured Data */}
       <script type="application/ld+json">
-        {JSON.stringify(structuredData)}
+        {JSON.stringify(metaTags.structuredData)}
       </script>
+
+      {/* Organization Structured Data */}
+      <script type="application/ld+json">
+        {JSON.stringify(organizationData)}
+      </script>
+
+      {/* Breadcrumb Structured Data */}
+      {breadcrumbData && (
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbData)}
+        </script>
+      )}
+
+      {/* FAQ Structured Data for Tools */}
+      {faqData && (
+        <script type="application/ld+json">
+          {JSON.stringify(faqData)}
+        </script>
+      )}
     </Helmet>
   );
 };

@@ -12,8 +12,8 @@ const ToolCategoryShowcases: React.FC = () => {
   const categories = [
     {
       id: 'everyday-life',
-      name: 'Everyday Life Tools',
-      description: 'Essential calculators for daily tasks',
+      name: 'Everyday Life Calculators & Tools',
+      description: 'Free online calculators for tip calculation, BMI, age calculation, loan payments, and percentage calculations. No signup required.',
       sarcasticQuote: 'Stop doing math on napkins like a caveman - let technology handle your basic arithmetic anxiety.',
       icon: Calculator,
       gradient: 'from-green-500 to-blue-600',
@@ -30,7 +30,7 @@ const ToolCategoryShowcases: React.FC = () => {
     {
       id: 'text-writing',
       name: 'Text & Writing Tools',
-      description: 'Transform and analyze text effortlessly',
+      description: 'Free text analysis tools including word counter, case converter, lorem ipsum generator, diff checker, and text summarizer. No registration required.',
       sarcasticQuote: 'Transform your text without the Microsoft Word subscription - because paying monthly for basic text editing is peak capitalism.',
       icon: FileText,
       gradient: 'from-amber-500 to-orange-600',
@@ -46,7 +46,7 @@ const ToolCategoryShowcases: React.FC = () => {
     {
       id: 'creative-design',
       name: 'Creative & Design Tools',
-      description: 'Design tools for the artistically challenged',
+      description: 'Free design tools including CSS gradient generator, emoji picker, ASCII art generator, and favicon generator. Create beautiful designs without signup.',
       sarcasticQuote: 'Create beautiful designs without the art school debt - because creativity shouldn\'t require a mortgage.',
       icon: Palette,
       gradient: 'from-pink-500 to-red-600',
@@ -61,7 +61,7 @@ const ToolCategoryShowcases: React.FC = () => {
     {
       id: 'time-productivity',
       name: 'Time & Productivity Tools',
-      description: 'Manage time like a productivity guru',
+      description: 'Free productivity tools including Pomodoro timer, world clock, stopwatch, and countdown timer. Boost focus and manage time effectively.',
       sarcasticQuote: 'Procrastinate more efficiently with timed focus sessions - because if you\'re going to waste time, at least do it systematically.',
       icon: Clock,
       gradient: 'from-orange-500 to-red-600',
@@ -76,7 +76,7 @@ const ToolCategoryShowcases: React.FC = () => {
     {
       id: 'developer-tools',
       name: 'Developer Tools',
-      description: 'Code utilities for the technically inclined',
+      description: 'Free developer tools including JSON formatter, Base64 encoder/decoder, UUID generator, JWT decoder, and URL encoder. Essential coding utilities.',
       sarcasticQuote: 'Debug your code, not your sanity - because life\'s too short to manually format JSON like it\'s 1999.',
       icon: Code,
       gradient: 'from-violet-500 to-fuchsia-600',
@@ -93,7 +93,7 @@ const ToolCategoryShowcases: React.FC = () => {
     {
       id: 'number-conversion',
       name: 'Number & Conversion Tools',
-      description: 'Convert numbers like a computer',
+      description: 'Free number conversion tools including binary, hexadecimal, decimal, octal, and Roman numeral converters. Convert between number bases instantly.',
       sarcasticQuote: 'Convert numbers like a computer science student - because manually calculating binary is what separates us from the machines.',
       icon: Hash,
       gradient: 'from-cyan-500 to-blue-600',

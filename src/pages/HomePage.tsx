@@ -29,6 +29,7 @@ import PersonalizedRecommendations from '../components/PersonalizedRecommendatio
 import EnhancedFeaturesSection from '../components/EnhancedFeaturesSection';
 import PWAPromotionSection from '../components/PWAPromotionSection';
 import EnhancedTestimonialsSection from '../components/EnhancedTestimonialsSection';
+import SEOContent from '../components/SEOContent';
 import { useSearchModal } from '../hooks/useSearchModal';
 
 const HomePage: React.FC = () => {
@@ -408,6 +409,9 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* SEO Content Section */}
+      <SEOContent type="homepage" className="relative py-20 px-6" />
 
       {/* Search Modal */}
       <SearchModal isOpen={isSearchOpen} onClose={closeSearch} />

@@ -1,13 +1,161 @@
-# SPA fallback for React Router
-/*    /index.html   200
+# Netlify redirects and rewrites for SEO optimization
 
-# API redirects (if you add API endpoints later)
-/api/*  https://api.braindead.site/:splat  200
+# Redirect common URL variations to canonical URLs (301 permanent redirects)
+/calculator/           /calculator           301
+/color-picker/         /color-picker         301
+/qr-generator/         /qr-generator         301
+/text-tools/           /text-tools           301
+/password-generator/   /password-generator   301
+/hash-generator/       /hash-generator       301
+/image-optimizer/      /image-optimizer      301
+/timestamp-converter/  /timestamp-converter  301
+/json-formatter/       /json-formatter       301
+/random-generator/     /random-generator     301
+/unit-converter/       /unit-converter       301
 
-# Redirect old URLs (if any)
-/tools/*  /:splat  301
+# New tools trailing slash redirects
+/tip-calculator/       /tip-calculator       301
+/age-calculator/       /age-calculator       301
+/bmi-calculator/       /bmi-calculator       301
+/loan-calculator/      /loan-calculator      301
+/percentage-calculator/ /percentage-calculator 301
+/grade-calculator/     /grade-calculator     301
+/word-counter/         /word-counter         301
+/text-case-converter/  /text-case-converter  301
+/lorem-ipsum/          /lorem-ipsum          301
+/diff-checker/         /diff-checker         301
+/text-summarizer/      /text-summarizer      301
+/gradient-generator/   /gradient-generator   301
+/ascii-art-generator/  /ascii-art-generator  301
+/favicon-generator/    /favicon-generator    301
+/pomodoro-timer/       /pomodoro-timer       301
+/world-clock/          /world-clock          301
+/stopwatch-timer/      /stopwatch-timer      301
+/countdown-timer/      /countdown-timer      301
+/base64-encoder/       /base64-encoder       301
+/url-encoder/          /url-encoder          301
+/markdown-editor/      /markdown-editor      301
+/uuid-generator/       /uuid-generator       301
+/jwt-decoder/          /jwt-decoder          301
+/number-converter/     /number-converter     301
+/roman-numeral/        /roman-numeral        301
+
+# Redirect underscore URLs to hyphen URLs (SEO best practice)
+/calculator_           /calculator           301
+/color_picker          /color-picker         301
+/qr_generator          /qr-generator         301
+/text_tools            /text-tools           301
+/password_generator    /password-generator   301
+/hash_generator        /hash-generator       301
+/image_optimizer       /image-optimizer      301
+/timestamp_converter   /timestamp-converter  301
+/json_formatter        /json-formatter       301
+/random_generator      /random-generator     301
+/unit_converter        /unit-converter       301
+/tip_calculator        /tip-calculator       301
+/age_calculator        /age-calculator       301
+/bmi_calculator        /bmi-calculator       301
+/loan_calculator       /loan-calculator      301
+/percentage_calculator /percentage-calculator 301
+/grade_calculator      /grade-calculator     301
+/word_counter          /word-counter         301
+/text_case_converter   /text-case-converter  301
+/lorem_ipsum           /lorem-ipsum          301
+/diff_checker          /diff-checker         301
+/text_summarizer       /text-summarizer      301
+/gradient_generator    /gradient-generator   301
+/ascii_art_generator   /ascii-art-generator  301
+/favicon_generator     /favicon-generator    301
+/pomodoro_timer        /pomodoro-timer       301
+/world_clock           /world-clock          301
+/stopwatch_timer       /stopwatch-timer      301
+/countdown_timer       /countdown-timer      301
+/base64_encoder        /base64-encoder       301
+/url_encoder           /url-encoder          301
+/markdown_editor       /markdown-editor      301
+/uuid_generator        /uuid-generator       301
+/jwt_decoder           /jwt-decoder          301
+/number_converter      /number-converter     301
+/roman_numeral         /roman-numeral        301
+
+# Redirect alternative tool names to canonical URLs
+/calc                  /calculator           301
+/color                 /color-picker         301
+/qr                    /qr-generator         301
+/text                  /text-tools           301
+/password              /password-generator   301
+/hash                  /hash-generator       301
+/image                 /image-optimizer      301
+/timestamp             /timestamp-converter  301
+/json                  /json-formatter       301
+/random                /random-generator     301
+/units                 /unit-converter       301
+/tip                   /tip-calculator       301
+/age                   /age-calculator       301
+/bmi                   /bmi-calculator       301
+/loan                  /loan-calculator      301
+/percentage            /percentage-calculator 301
+/percent               /percentage-calculator 301
+/grade                 /grade-calculator     301
+/gpa                   /grade-calculator     301
+/words                 /word-counter         301
+/case                  /text-case-converter  301
+/lorem                 /lorem-ipsum          301
+/diff                  /diff-checker         301
+/summary               /text-summarizer      301
+/gradient              /gradient-generator   301
+/ascii                 /ascii-art-generator  301
+/favicon               /favicon-generator    301
+/pomodoro              /pomodoro-timer       301
+/timer                 /pomodoro-timer       301
+/clock                 /world-clock          301
+/stopwatch             /stopwatch-timer      301
+/countdown             /countdown-timer      301
+/base64                /base64-encoder       301
+/url                   /url-encoder          301
+/markdown              /markdown-editor      301
+/md                    /markdown-editor      301
+/uuid                  /uuid-generator       301
+/guid                  /uuid-generator       301
+/jwt                   /jwt-decoder          301
+/binary                /number-converter     301
+/hex                   /number-converter     301
+/roman                 /roman-numeral        301
 
 # Security redirects
-/admin/*  /  301
-/.env*  /  301
-/config/*  /  301
+/admin/*               /                     301
+/.env*                 /                     301
+/config/*              /                     301
+/.git/*                /                     301
+/node_modules/*        /                     301
+
+# Legacy URL redirects
+/tools/*               /:splat               301
+
+# API redirects (if you add API endpoints later)
+/api/*                 https://api.braindead.site/:splat  200
+
+# Security headers for all pages
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Cache control for static assets
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache control for HTML files
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Cache control for SEO files
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+# SPA fallback - serve index.html for all routes (must be last)
+/*    /index.html   200

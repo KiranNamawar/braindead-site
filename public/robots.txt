@@ -4,5 +4,48 @@ Allow: /
 # Sitemap
 Sitemap: https://braindead.site/sitemap.xml
 
-# Crawl delay
+# Crawl-delay for respectful crawling
 Crawl-delay: 1
+
+# Allow all tools and pages
+Allow: /calculator
+Allow: /color-picker
+Allow: /qr-generator
+Allow: /text-tools
+Allow: /password-generator
+Allow: /hash-generator
+Allow: /image-optimizer
+Allow: /timestamp-converter
+Allow: /json-formatter
+Allow: /random-generator
+Allow: /unit-converter
+Allow: /tip-calculator
+Allow: /age-calculator
+Allow: /bmi-calculator
+Allow: /loan-calculator
+Allow: /percentage-calculator
+Allow: /grade-calculator
+Allow: /word-counter
+Allow: /text-case-converter
+Allow: /lorem-ipsum
+Allow: /diff-checker
+Allow: /text-summarizer
+Allow: /gradient-generator
+Allow: /ascii-art-generator
+Allow: /favicon-generator
+Allow: /pomodoro-timer
+Allow: /world-clock
+Allow: /stopwatch-timer
+Allow: /countdown-timer
+Allow: /base64-encoder
+Allow: /url-encoder
+Allow: /markdown-editor
+Allow: /uuid-generator
+Allow: /jwt-decoder
+Allow: /number-converter
+Allow: /roman-numeral
+
+# Cache directives for better SEO
+# (These are suggestions for server configuration)
+# Cache-Control: public, max-age=3600 for static assets
+# Cache-Control: public, max-age=86400 for tool pages

@@ -12,7 +12,9 @@ import ToolIntegrationPanel from './ToolIntegrationPanel';
 import ExportButton from './ExportButton';
 import BatchOperationPanel from './BatchOperationPanel';
 import SEOHead from '../SEOHead';
+import Breadcrumbs from '../Breadcrumbs';
 import { useToast } from '../ToastContainer';
+import { generateToolSEO } from '../../utils/seo';
 
 interface ToolLayoutProps {
   toolId: string;
@@ -124,12 +126,20 @@ const ToolLayout: React.FC<ToolLayoutProps> = ({
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       <SEOHead 
+        toolId={toolId}
         title={title}
         description={description}
         keywords={tool?.keywords}
       />
       
       <div className="container mx-auto px-4 py-6 max-w-6xl">
+        {/* Breadcrumbs */}
+        {tool && (
+          <div className="mb-4">
+            <Breadcrumbs items={generateToolSEO(tool).breadcrumbs || []} />
+          </div>
+        )}
+        
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
