@@ -31,17 +31,28 @@ import PWAPromotionSection from '../components/PWAPromotionSection';
 import EnhancedTestimonialsSection from '../components/EnhancedTestimonialsSection';
 import SEOContent from '../components/SEOContent';
 import { useSearchModal } from '../hooks/useSearchModal';
+import { preloadOnHover, preloadBasedOnInteraction } from '../utils/resourcePreloader';
+import { trackCustomMetric, trackInteractionTime } from '../utils/performanceMonitor';
 
 const HomePage: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { isOpen: isSearchOpen, openModal: openSearch, closeModal: closeSearch } = useSearchModal();
 
   useEffect(() => {
+    const startTime = performance.now();
+    
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
+    
+    // Track homepage load time
+    trackCustomMetric('homepage_load_time', performance.now() - startTime);
+    
+    // Preload based on current interaction
+    preloadBasedOnInteraction('/');
+    
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
@@ -363,6 +374,15 @@ const HomePage: React.FC = () => {
 
                 <Link
                   to={tool.path}
+                  onMouseEnter={() => {
+                    const startTime = performance.now();
+                    preloadOnHover(tool.path);
+                    trackInteractionTime('tool_hover', startTime);
+                  }}
+                  onClick={() => {
+                    const startTime = performance.now();
+                    trackInteractionTime('tool_click', startTime);
+                  }}
                   className={`inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r ${tool.gradient} rounded-xl font-semibold text-white hover:scale-105 transition-all duration-300 group-hover:shadow-lg`}
                 >
                   <span>Try {tool.name}</span>
