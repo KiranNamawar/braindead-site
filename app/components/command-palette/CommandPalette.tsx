@@ -27,6 +27,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const selectedItemRef = useRef<HTMLDivElement>(null);
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
+    new Set()
+  );
 
   const {
     query,
@@ -94,6 +97,19 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     handleOpenChange(false);
   };
 
+  // Toggle category collapse state
+  const toggleCategory = (category: string) => {
+    setCollapsedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
   // Define category order for consistent display
   const categoryOrder = [
     "Text Tools",
@@ -130,7 +146,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   // Create a flattened list of all selectable items for keyboard navigation
   const getAllSelectableItems = useCallback(() => {
     const items: Array<{
-      type: "utility" | "search";
+      type: "utility" | "search" | "category";
       data: Utility | string;
       id: string;
     }> = [];
@@ -154,15 +170,25 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         });
       });
     } else {
-      // Add search results in category order
+      // Add search results in category order with category headers
       orderedCategories.forEach((category) => {
-        groupedResults[category].forEach((result) => {
-          items.push({
-            type: "utility",
-            data: result.item,
-            id: `result-${result.item.id}`,
-          });
+        // Add category header as selectable item
+        items.push({
+          type: "category",
+          data: category,
+          id: `category-${category}`,
         });
+
+        // Add category items only if category is not collapsed
+        if (!collapsedCategories.has(category)) {
+          groupedResults[category].forEach((result) => {
+            items.push({
+              type: "utility",
+              data: result.item,
+              id: `result-${result.item.id}`,
+            });
+          });
+        }
       });
     }
 
@@ -173,6 +199,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     recentSearchItems,
     orderedCategories,
     groupedResults,
+    collapsedCategories,
   ]);
 
   const selectableItems = getAllSelectableItems();
@@ -182,52 +209,32 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     setSelectedIndex(-1);
   }, [query, resultsWithScores, recentItems, recentSearchItems]);
 
-  // Handle keyboard navigation
+  // Handle keyboard navigation for wrap-around and category toggling
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (!paletteOpen) return;
 
-      const items = getAllSelectableItems();
-      if (items.length === 0) return;
+      // Only handle specific keys that we need for wrap-around or category toggling
+      if (event.key === "Enter" || event.key === " ") {
+        const items = getAllSelectableItems();
+        if (selectedIndex >= 0 && selectedIndex < items.length) {
+          const selectedItem = items[selectedIndex];
 
-      switch (event.key) {
-        case "ArrowDown":
-          event.preventDefault();
-          setSelectedIndex((prev) => {
-            const next = prev + 1;
-            return next >= items.length ? 0 : next;
-          });
-          break;
-
-        case "ArrowUp":
-          event.preventDefault();
-          setSelectedIndex((prev) => {
-            const next = prev - 1;
-            return next < 0 ? items.length - 1 : next;
-          });
-          break;
-
-        case "Enter":
-          if (selectedIndex >= 0 && selectedIndex < items.length) {
+          if (selectedItem.type === "category") {
             event.preventDefault();
-            const selectedItem = items[selectedIndex];
-
-            if (selectedItem.type === "utility") {
-              handleSelect(selectedItem.data as Utility);
-            } else if (selectedItem.type === "search") {
-              setQuery(selectedItem.data as string);
-            }
+            event.stopPropagation();
+            toggleCategory(selectedItem.data as string);
           }
-          break;
+        }
       }
     },
-    [paletteOpen, selectedIndex, getAllSelectableItems, handleSelect, setQuery]
+    [paletteOpen, selectedIndex, getAllSelectableItems, toggleCategory]
   );
 
   // Attach keyboard event listener
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true); // Use capture phase
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
   }, [handleKeyDown]);
 
   // Auto-scroll to keep selected item visible
@@ -257,6 +264,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       onOpenChange={handleOpenChange}
       title="Command Palette"
       description="Search for tools and utilities"
+      loop={true}
     >
       <CommandInput
         ref={inputRef}
@@ -337,64 +345,109 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         )}
 
         {!showRecentItems &&
-          orderedCategories.map((category, index) => (
-            <div key={category}>
-              {index > 0 && <CommandSeparator />}
-              <CommandGroup heading={category}>
-                {groupedResults[category].map((result: SearchResult) => {
-                  const itemId = `result-${result.item.id}`;
-                  const isSelected = isItemSelected(itemId);
+          orderedCategories.map((category, index) => {
+            const isCollapsed = collapsedCategories.has(category);
+            const categoryId = `category-${category}`;
+            const isCategorySelected = isItemSelected(categoryId);
 
-                  return (
-                    <CommandItem
-                      key={result.item.id}
-                      value={result.item.name}
-                      onSelect={() => handleSelect(result.item)}
-                      ref={getItemRef(itemId)}
-                      className={
-                        isSelected ? "bg-accent text-accent-foreground" : ""
-                      }
-                    >
-                      <div className="flex flex-col flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">
-                            {highlightMatches(result.item.name, result, {
-                              key: "name",
-                            })}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {result.item.category}
-                          </span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {highlightMatches(result.item.description, result, {
-                            key: "description",
-                          })}
-                        </span>
-                        {result.item.tags.length > 0 && (
-                          <div className="flex gap-1 mt-1">
-                            {result.item.tags.slice(0, 3).map((tag: string) => (
-                              <span
-                                key={tag}
-                                className="text-xs bg-muted px-1 py-0.5 rounded"
-                              >
-                                {highlightMatches(tag, result, { key: "tags" })}
+            return (
+              <div key={category}>
+                {index > 0 && <CommandSeparator />}
+
+                {/* Custom collapsible category header */}
+                <div
+                  className={`flex items-center justify-between px-2 py-1 text-sm font-medium text-muted-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground ${
+                    isCategorySelected ? "bg-accent text-accent-foreground" : ""
+                  }`}
+                  onClick={() => toggleCategory(category)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleCategory(category);
+                    }
+                  }}
+                  ref={getItemRef(categoryId)}
+                  data-testid={`category-header-${category
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
+                  tabIndex={0}
+                  role="button"
+                  aria-expanded={!isCollapsed}
+                  aria-label={`${
+                    isCollapsed ? "Expand" : "Collapse"
+                  } ${category} category`}
+                >
+                  <span>{category}</span>
+                  <span className="text-xs">{isCollapsed ? "▶" : "▼"}</span>
+                </div>
+
+                {/* Category items - only show if not collapsed */}
+                {!isCollapsed && (
+                  <CommandGroup>
+                    {groupedResults[category].map((result: SearchResult) => {
+                      const itemId = `result-${result.item.id}`;
+                      const isSelected = isItemSelected(itemId);
+
+                      return (
+                        <CommandItem
+                          key={result.item.id}
+                          value={result.item.name}
+                          onSelect={() => handleSelect(result.item)}
+                          ref={getItemRef(itemId)}
+                          className={
+                            isSelected ? "bg-accent text-accent-foreground" : ""
+                          }
+                        >
+                          <div className="flex flex-col flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium">
+                                {highlightMatches(result.item.name, result, {
+                                  key: "name",
+                                })}
                               </span>
-                            ))}
-                            {result.item.tags.length > 3 && (
                               <span className="text-xs text-muted-foreground">
-                                +{result.item.tags.length - 3}
+                                {result.item.category}
                               </span>
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              {highlightMatches(
+                                result.item.description,
+                                result,
+                                {
+                                  key: "description",
+                                }
+                              )}
+                            </span>
+                            {result.item.tags.length > 0 && (
+                              <div className="flex gap-1 mt-1">
+                                {result.item.tags
+                                  .slice(0, 3)
+                                  .map((tag: string) => (
+                                    <span
+                                      key={tag}
+                                      className="text-xs bg-muted px-1 py-0.5 rounded"
+                                    >
+                                      {highlightMatches(tag, result, {
+                                        key: "tags",
+                                      })}
+                                    </span>
+                                  ))}
+                                {result.item.tags.length > 3 && (
+                                  <span className="text-xs text-muted-foreground">
+                                    +{result.item.tags.length - 3}
+                                  </span>
+                                )}
+                              </div>
                             )}
                           </div>
-                        )}
-                      </div>
-                    </CommandItem>
-                  );
-                })}
-              </CommandGroup>
-            </div>
-          ))}
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                )}
+              </div>
+            );
+          })}
       </CommandList>
     </CommandDialog>
   );
