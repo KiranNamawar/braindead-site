@@ -100,7 +100,7 @@
     - Commit changes with descriptive message
     - _Requirements: 4.1, 4.2, 4.3, 4.5_
 
-  - [ ] 4.4 Add recent and frequent tools display
+  - [x] 4.4 Add recent and frequent tools display
     - Show recent tools when palette is opened
     - Display frequently used tools when no query
     - Test recent and frequent tools display

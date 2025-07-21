@@ -1,9 +1,20 @@
+import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
-import { BrowserRouter } from "react-router";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { BrowserRouter, useNavigate } from "react-router";
 import { CommandPalette } from "../CommandPalette";
-import { SearchProvider } from "~/lib/command-palette/search-context";
+import {
+  SearchProvider,
+  useSearch,
+} from "~/lib/command-palette/search-context";
+import { sampleUtilities } from "~/lib/command-palette/data";
+
+// Mock scrollIntoView
+Object.defineProperty(Element.prototype, "scrollIntoView", {
+  value: vi.fn(),
+  writable: true,
+});
 
 // Mock the react-router navigate
 const mockNavigate = vi.fn();
@@ -22,6 +33,10 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 describe("CommandPalette", () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+  });
+
   it("renders command palette when open", () => {
     render(
       <TestWrapper>
