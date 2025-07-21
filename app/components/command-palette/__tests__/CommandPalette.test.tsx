@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router";
 import { CommandPalette } from "../CommandPalette";
@@ -77,5 +78,170 @@ describe("CommandPalette", () => {
       },
       { timeout: 100 }
     );
+  });
+
+  describe("Category Grouping", () => {
+    it("groups search results by category", async () => {
+      const user = userEvent.setup();
+
+      render(
+        <TestWrapper>
+          <CommandPalette open={true} />
+        </TestWrapper>
+      );
+
+      const searchInput = screen.getByPlaceholderText(
+        "Search for tools and utilities..."
+      );
+
+      // Search for "json" which should return Developer Tools category
+      await user.type(searchInput, "json");
+
+      // Wait for search results to appear - look for the category group heading
+      await waitFor(() => {
+        // Look for category group heading element
+        const categoryHeading = document.querySelector("[cmdk-group-heading]");
+        expect(categoryHeading).toHaveTextContent("Developer Tools");
+      });
+
+      // Verify the JSON Formatter tool appears under Developer Tools
+      expect(screen.getByText("JSON Formatter")).toBeInTheDocument();
+    });
+
+    it("displays categories in consistent order", async () => {
+      const user = userEvent.setup();
+
+      render(
+        <TestWrapper>
+          <CommandPalette open={true} />
+        </TestWrapper>
+      );
+
+      const searchInput = screen.getByPlaceholderText(
+        "Search for tools and utilities..."
+      );
+
+      // Search for a broad term that should return multiple categories
+      await user.type(searchInput, "format");
+
+      // Wait for search results
+      await waitFor(() => {
+        // Check that we have visible category groups (not hidden)
+        const visibleGroups = document.querySelectorAll(
+          "[cmdk-group]:not([hidden])"
+        );
+        expect(visibleGroups.length).toBeGreaterThan(0);
+      });
+
+      // Get all category headings and verify order
+      const categoryHeadings = document.querySelectorAll(
+        "[cmdk-group-heading]"
+      );
+      const visibleCategories = Array.from(categoryHeadings)
+        .filter((heading) => !heading.closest("[hidden]"))
+        .map((heading) => heading.textContent);
+
+      // Categories should appear in our predefined order
+      const expectedOrder = [
+        "Text Tools",
+        "Developer Tools",
+        "Image Tools",
+        "Productivity Tools",
+        "Fun Tools",
+      ];
+      const actualOrder = expectedOrder.filter((category) =>
+        visibleCategories.includes(category)
+      );
+
+      expect(visibleCategories).toEqual(actualOrder);
+    });
+
+    it("hides empty categories", async () => {
+      const user = userEvent.setup();
+
+      render(
+        <TestWrapper>
+          <CommandPalette open={true} />
+        </TestWrapper>
+      );
+
+      const searchInput = screen.getByPlaceholderText(
+        "Search for tools and utilities..."
+      );
+
+      // Search for something specific that should only appear in one category
+      await user.type(searchInput, "json formatter");
+
+      // Wait for search results
+      await waitFor(() => {
+        expect(screen.getByText("JSON Formatter")).toBeInTheDocument();
+      });
+
+      // Verify only Developer Tools category group is visible
+      const visibleGroups = document.querySelectorAll(
+        "[cmdk-group]:not([hidden])"
+      );
+      expect(visibleGroups.length).toBe(1);
+
+      const visibleCategory = visibleGroups[0].querySelector(
+        "[cmdk-group-heading]"
+      );
+      expect(visibleCategory).toHaveTextContent("Developer Tools");
+    });
+
+    it("shows appropriate results under each category", async () => {
+      const user = userEvent.setup();
+
+      render(
+        <TestWrapper>
+          <CommandPalette open={true} />
+        </TestWrapper>
+      );
+
+      const searchInput = screen.getByPlaceholderText(
+        "Search for tools and utilities..."
+      );
+
+      // Search for "case" which should show Case Converter tool
+      await user.type(searchInput, "case");
+
+      // Wait for search results
+      await waitFor(() => {
+        // Look for Text Tools category heading
+        const textToolsHeading = Array.from(
+          document.querySelectorAll("[cmdk-group-heading]")
+        ).find((heading) => heading.textContent === "Text Tools");
+        expect(textToolsHeading).toBeInTheDocument();
+      });
+
+      // Verify case-related tools appear
+      expect(screen.getByText("Case Converter")).toBeInTheDocument();
+    });
+
+    it("handles search with no results properly", async () => {
+      const user = userEvent.setup();
+
+      render(
+        <TestWrapper>
+          <CommandPalette open={true} />
+        </TestWrapper>
+      );
+
+      const searchInput = screen.getByPlaceholderText(
+        "Search for tools and utilities..."
+      );
+
+      // Search for something that shouldn't exist
+      await user.type(searchInput, "nonexistenttoolthatdoesntexist");
+
+      // Wait for empty state
+      await waitFor(() => {
+        expect(screen.getByText("No tools found")).toBeInTheDocument();
+      });
+
+      // Verify no category headers are shown
+      expect(screen.queryByText("Text Tools")).not.toBeInTheDocument();
+      expect(screen.queryByText("Developer Tools")).not.toBeInTheDocument();
+    });
   });
 });

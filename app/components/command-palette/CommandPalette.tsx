@@ -89,7 +89,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     handleOpenChange(false);
   };
 
-  // Group results by category
+  // Define category order for consistent display
+  const categoryOrder = [
+    "Text Tools",
+    "Developer Tools",
+    "Image Tools",
+    "Productivity Tools",
+    "Fun Tools",
+  ];
+
+  // Group results by category with consistent ordering
   const groupedResults = resultsWithScores.reduce(
     (groups: Record<string, SearchResult[]>, result: SearchResult) => {
       const category = result.item.category;
@@ -100,6 +109,12 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       return groups;
     },
     {} as Record<string, SearchResult[]>
+  );
+
+  // Get ordered categories that have results (hide empty categories)
+  const orderedCategories = categoryOrder.filter(
+    (category) =>
+      groupedResults[category] && groupedResults[category].length > 0
   );
 
   // Get recent items to show when no query
@@ -175,7 +190,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         )}
 
         {!showRecentItems &&
-          Object.keys(groupedResults).map((category, index) => (
+          orderedCategories.map((category, index) => (
             <div key={category}>
               {index > 0 && <CommandSeparator />}
               <CommandGroup heading={category}>
