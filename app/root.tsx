@@ -8,6 +8,11 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import {
+  GoogleAnalytics,
+  GoogleAnalyticsScripts,
+} from "./components/GoogleAnalytics";
+import { ThemeProvider } from "./components/theme-provider";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -19,21 +24,42 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap",
   },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <GoogleAnalyticsScripts trackingId="G-NH2T2ZGXYL" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var theme = localStorage.getItem('theme') || 'system';
+                var systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                var appliedTheme = theme === 'system' ? systemTheme : theme;
+                document.documentElement.classList.toggle('dark', appliedTheme === 'dark');
+              })();
+            `,
+          }}
+        />
       </head>
       <body>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+        <GoogleAnalytics trackingId="G-NH2T2ZGXYL" />
         <ScrollRestoration />
         <Scripts />
       </body>
