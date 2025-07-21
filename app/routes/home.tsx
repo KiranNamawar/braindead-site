@@ -4,8 +4,12 @@ import { ThemeToggle } from "~/components/theme-toggle";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "BrainDead" },
-    { name: "description", content: "Collection of everyday web tools" },
+    { title: "BrainDead - Working Search Navigation" },
+    {
+      name: "description",
+      content:
+        "Collection of everyday web tools with working keyboard navigation",
+    },
   ];
 }
 
@@ -21,10 +25,10 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center justify-center">
           <h2 className="text-4xl font-bold mb-4">Welcome to BrainDead</h2>
-          <p className="text-lg text-muted-foreground">
-            Collection of everyday web tools
+          <p className="text-lg text-muted-foreground mb-8">
+            Collection of everyday web tools with working keyboard navigation
           </p>
-          <SearchDemo/>
+          <SearchDemo />
         </div>
       </main>
     </div>

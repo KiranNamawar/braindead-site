@@ -159,20 +159,111 @@ describe('SearchBar', () => {
       />
     );
     
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('searchbox');
     fireEvent.focus(input);
     
     // Check ARIA attributes
     expect(input).toHaveAttribute('aria-autocomplete', 'list');
-    expect(input).toHaveAttribute('aria-controls', 'search-suggestions');
     expect(input).toHaveAttribute('aria-expanded', 'true');
+    
+    // The ID is now dynamically generated, so we need to get it from the attribute
+    const controlsId = input.getAttribute('aria-controls');
+    expect(controlsId).toBeTruthy();
     
     // Check that suggestions have correct role
     const suggestionsList = screen.getByRole('listbox');
     expect(suggestionsList).toBeInTheDocument();
+    expect(suggestionsList.id).toBe(controlsId);
     
     // Check that suggestions have correct role
     const options = screen.getAllByRole('option');
     expect(options.length).toBe(3);
+  });
+  
+  test('provides proper screen reader announcements', () => {
+    const onSearch = jest.fn();
+    
+    render(
+      <SearchBar 
+        onSearch={onSearch} 
+        suggestions={mockSuggestions}
+      />
+    );
+    
+    const input = screen.getByRole('searchbox');
+    
+    // Check for live region
+    const liveRegion = screen.getByRole('status');
+    expect(liveRegion).toBeInTheDocument();
+    
+    // Check for label and description
+    expect(screen.getByLabelText('Search utilities')).toBe(input);
+    
+    // Custom label and description
+    render(
+      <SearchBar 
+        onSearch={onSearch} 
+        label="Custom label"
+        description="Custom description"
+      />
+    );
+    
+    expect(screen.getByLabelText('Custom label')).toBeInTheDocument();
+  });
+  
+  test('shows loading indicator when isLoading is true', () => {
+    const onSearch = jest.fn();
+    
+    render(
+      <SearchBar 
+        onSearch={onSearch} 
+        isLoading={true}
+      />
+    );
+    
+    expect(screen.getByText('Loading search results')).toBeInTheDocument();
+  });
+  
+  test('works as a controlled component with external query', () => {
+    const onSearch = jest.fn();
+    
+    const { rerender } = render(
+      <SearchBar 
+        onSearch={onSearch} 
+        query="controlled"
+      />
+    );
+    
+    const input = screen.getByRole('searchbox');
+    expect(input).toHaveValue('controlled');
+    
+    // Update the controlled value
+    rerender(
+      <SearchBar 
+        onSearch={onSearch} 
+        query="updated"
+      />
+    );
+    
+    expect(input).toHaveValue('updated');
+  });
+  
+  test('has proper accessibility attributes', () => {
+    const onSearch = jest.fn();
+    
+    const { container } = render(
+      <SearchBar 
+        onSearch={onSearch} 
+        suggestions={mockSuggestions}
+      />
+    );
+    
+    const input = screen.getByRole('searchbox');
+    fireEvent.focus(input);
+    
+    // Check for proper accessibility attributes
+    expect(input).toHaveAttribute('aria-autocomplete', 'list');
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input).toHaveAttribute('aria-describedby');
   });
 });
