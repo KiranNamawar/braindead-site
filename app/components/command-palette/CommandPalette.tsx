@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
+import { XIcon } from "lucide-react";
 import {
   CommandDialog,
   CommandInput,
@@ -266,12 +267,22 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       description="Search for tools and utilities"
       loop={true}
     >
-      <CommandInput
-        ref={inputRef}
-        placeholder="Search for tools and utilities..."
-        value={query}
-        onValueChange={setQuery}
-      />
+      <div className="relative">
+        <CommandInput
+          ref={inputRef}
+          placeholder="Search for tools and utilities..."
+          value={query}
+          onValueChange={setQuery}
+        />
+        {/* Mobile close button */}
+        <button
+          onClick={() => handleOpenChange(false)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-accent hover:text-accent-foreground sm:hidden"
+          aria-label="Close search"
+        >
+          <XIcon className="h-5 w-5" />
+        </button>
+      </div>
       <CommandList>
         {showRecentItems && recentItems.length > 0 && (
           <>
@@ -356,9 +367,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
                 {/* Custom collapsible category header */}
                 <div
-                  className={`flex items-center justify-between px-2 py-1 text-sm font-medium text-muted-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground ${
+                  className={`flex items-center justify-between px-2 text-sm font-medium text-muted-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors ${
                     isCategorySelected ? "bg-accent text-accent-foreground" : ""
-                  }`}
+                  }
+                  py-3 sm:py-1 min-h-[44px] sm:min-h-[auto] active:bg-accent/80`}
                   onClick={() => toggleCategory(category)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -378,7 +390,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   } ${category} category`}
                 >
                   <span>{category}</span>
-                  <span className="text-xs">{isCollapsed ? "▶" : "▼"}</span>
+                  <span className="text-sm sm:text-xs">
+                    {isCollapsed ? "▶" : "▼"}
+                  </span>
                 </div>
 
                 {/* Category items - only show if not collapsed */}

@@ -149,6 +149,33 @@ describe("CommandPalette", () => {
     );
   });
 
+  it("renders mobile close button", () => {
+    render(
+      <TestWrapper>
+        <CommandPalette open={true} />
+      </TestWrapper>
+    );
+
+    const closeButton = screen.getByLabelText("Close search");
+    expect(closeButton).toBeInTheDocument();
+    expect(closeButton).toHaveClass("sm:hidden"); // Should be hidden on desktop
+  });
+
+  it("closes palette when mobile close button is clicked", async () => {
+    const mockOnOpenChange = vi.fn();
+
+    render(
+      <TestWrapper>
+        <CommandPalette open={true} onOpenChange={mockOnOpenChange} />
+      </TestWrapper>
+    );
+
+    const closeButton = screen.getByLabelText("Close search");
+    await userEvent.click(closeButton);
+
+    expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+  });
+
   describe("Category Grouping", () => {
     it("groups search results by category", async () => {
       const user = userEvent.setup();

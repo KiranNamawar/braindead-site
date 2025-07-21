@@ -155,7 +155,7 @@
 
 - [ ] 7. Implement mobile support
 
-  - [ ] 7.1 Create search button component
+  - [x] 7.1 Create search button component
 
     - Add button to header for mobile devices
     - Implement tap handler to open palette

@@ -51,7 +51,16 @@ function CommandDialog({
         <DialogDescription>{description}</DialogDescription>
       </DialogHeader>
       <DialogContent
-        className={cn("overflow-hidden p-0 h-[480px] max-w-[640px]", className)}
+        className={cn(
+          "overflow-hidden p-0",
+          // Mobile optimizations
+          "h-[85vh] max-h-[640px] w-[95vw] max-w-[640px]",
+          // On mobile, position slightly higher and make fullscreen-like
+          "sm:h-[480px] sm:w-full sm:max-w-[640px]",
+          // Better mobile positioning
+          "top-[10%] translate-y-0 sm:top-[50%] sm:translate-y-[-50%]",
+          className
+        )}
         showCloseButton={showCloseButton}
       >
         <Command
@@ -72,13 +81,15 @@ function CommandInput({
   return (
     <div
       data-slot="command-input-wrapper"
-      className="flex h-9 items-center gap-2 border-b px-3"
+      className="flex items-center gap-2 border-b px-3 h-12 sm:h-9"
     >
-      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      <SearchIcon className="size-5 sm:size-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
           "placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+          // Larger text on mobile for better readability
+          "text-base sm:text-sm",
           className
         )}
         {...props}
@@ -95,7 +106,8 @@ function CommandList({
     <CommandPrimitive.List
       data-slot="command-list"
       className={cn(
-        "h-[420px] scroll-py-1 overflow-x-hidden overflow-y-auto",
+        // Mobile responsive height - takes up most of the available space
+        "h-[calc(85vh-3rem)] max-h-[580px] sm:h-[420px] scroll-py-1 overflow-x-hidden overflow-y-auto",
         className
       )}
       {...props}
@@ -152,7 +164,11 @@ function CommandItem({
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // Better touch targets on mobile
+        "py-3 sm:py-1.5 min-h-[44px] sm:min-h-[auto]",
+        // Improve touch feedback
+        "active:bg-accent/80 transition-colors",
         className
       )}
       {...props}
