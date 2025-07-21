@@ -88,6 +88,21 @@ export interface SearchIndex {
   categories: Map<CategoryType, string[]>;
   
   /**
+   * Map of words from utility names to utility IDs
+   */
+  nameIndex?: Map<string, string[]>;
+  
+  /**
+   * Map of words from utility descriptions to utility IDs
+   */
+  descriptionIndex?: Map<string, string[]>;
+  
+  /**
+   * Map of n-grams to utility IDs for partial matching
+   */
+  ngramIndex?: Map<string, string[]>;
+  
+  /**
    * Fuzzy matching engine for typo-tolerant search
    */
   fuzzyMatcher: FuzzyMatcher;

@@ -1,3 +1,4 @@
+import { SearchDemo } from "~/components/SearchDemo";
 import type { Route } from "./+types/home";
 import { ThemeToggle } from "~/components/theme-toggle";
 
@@ -23,6 +24,7 @@ export default function Home() {
           <p className="text-lg text-muted-foreground">
             Collection of everyday web tools
           </p>
+          <SearchDemo/>
         </div>
       </main>
     </div>
