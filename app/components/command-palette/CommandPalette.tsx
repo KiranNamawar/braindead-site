@@ -11,6 +11,7 @@ import {
 } from "~/components/ui/command";
 import { useSearch } from "~/lib/command-palette/search-context";
 import { useKeyboardShortcuts } from "./KeyboardShortcuts";
+import { highlightMatches } from "~/lib/command-palette/highlight-matches";
 import type { Utility } from "~/lib/types";
 import type { SearchResult } from "~/lib/command-palette/search-service";
 
@@ -202,13 +203,19 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   >
                     <div className="flex flex-col flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">{result.item.name}</span>
+                        <span className="font-medium">
+                          {highlightMatches(result.item.name, result, {
+                            key: "name",
+                          })}
+                        </span>
                         <span className="text-xs text-muted-foreground">
                           {result.item.category}
                         </span>
                       </div>
                       <span className="text-sm text-muted-foreground">
-                        {result.item.description}
+                        {highlightMatches(result.item.description, result, {
+                          key: "description",
+                        })}
                       </span>
                       {result.item.tags.length > 0 && (
                         <div className="flex gap-1 mt-1">
@@ -217,7 +224,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                               key={tag}
                               className="text-xs bg-muted px-1 py-0.5 rounded"
                             >
-                              {tag}
+                              {highlightMatches(tag, result, { key: "tags" })}
                             </span>
                           ))}
                           {result.item.tags.length > 3 && (

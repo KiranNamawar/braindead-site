@@ -1,8 +1,6 @@
-"use client";
-
 import * as React from "react";
 import { Moon, Sun, Monitor } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "../lib/theme-context";
 import { Button } from "./ui/button";
 import {
   Tooltip,
@@ -13,12 +11,6 @@ import {
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  // Avoid hydration mismatch by only rendering after mount
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const getNextTheme = () => {
     switch (theme) {
@@ -63,16 +55,6 @@ export function ThemeToggle() {
   const handleToggle = () => {
     setTheme(getNextTheme());
   };
-
-  // Render a placeholder button during SSR to prevent layout shift
-  if (!mounted) {
-    return (
-      <Button variant="ghost" size="sm" className="h-9 w-9 p-0" disabled>
-        <Sun className="h-4 w-4" />
-        <span className="sr-only">Theme toggle</span>
-      </Button>
-    );
-  }
 
   return (
     <TooltipProvider>

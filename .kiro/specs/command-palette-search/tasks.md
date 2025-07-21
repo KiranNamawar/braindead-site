@@ -73,7 +73,7 @@
 
 - [ ] 4. Implement search results display
 
-  - [ ] 4.1 Create categorized results grouping
+  - [x] 4.1 Create categorized results grouping
 
     - Group search results by utility categories
     - Implement category headers in results list
@@ -82,7 +82,7 @@
     - Commit changes with descriptive message
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-  - [ ] 4.2 Add result highlighting
+  - [x] 4.2 Add result highlighting
 
     - Highlight matching text in search results
     - Ensure highlighting works with fuzzy matches

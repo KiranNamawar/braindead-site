@@ -12,7 +12,10 @@ import {
   GoogleAnalytics,
   GoogleAnalyticsScripts,
 } from "./components/GoogleAnalytics";
-import { ThemeProvider } from "./components/theme-provider";
+import { ThemeProvider } from "./lib/theme-context";
+import { SearchProvider } from "./lib/command-palette/search-context";
+import { CommandPalette } from "./components/command-palette/CommandPalette";
+import { sampleUtilities } from "./lib/command-palette/data";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -51,13 +54,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
+        <ThemeProvider defaultTheme="system">
+          <SearchProvider utilities={sampleUtilities}>
+            <CommandPalette />
+            {children}
+          </SearchProvider>
         </ThemeProvider>
         <GoogleAnalytics trackingId="G-NH2T2ZGXYL" />
         <ScrollRestoration />
