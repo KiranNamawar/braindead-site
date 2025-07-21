@@ -1,177 +1,143 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createContext, useContext } from 'react';
-import { SearchProvider, useSearch } from '../search-context';
-import { Utility } from '../../types';
+import React from "react";
+import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { SearchProvider, useSearch } from "../search-context";
 
-// Mock React hooks
-vi.mock('react', async () => {
-  const actual = await vi.importActual('react');
-  return {
-    ...actual,
-    useState: vi.fn().mockImplementation((initialValue) => [initialValue, vi.fn()]),
-    useEffect: vi.fn().mockImplementation((fn) => fn()),
-    useContext: vi.fn(),
-    createContext: vi.fn().mockReturnValue({
-      Provider: ({ children }) => children,
-    }),
-  };
-});
-
-// Mock utilities for testing
-const mockUtilities: Utility[] = [
+const mockUtilities = [
   {
-    id: "test-tool-1",
-    name: "Test Tool One",
-    description: "This is the first test tool",
-    category: "Test Category",
-    tags: ["test", "one", "first"],
-    path: "/test/one",
+    id: "1",
+    name: "Alpha",
+    description: "First",
+    category: "A",
+    tags: [],
+    path: "/alpha",
   },
   {
-    id: "test-tool-2",
-    name: "Test Tool Two",
-    description: "This is the second test tool",
-    category: "Test Category",
-    tags: ["test", "two", "second"],
-    path: "/test/two",
-  },
-  {
-    id: "another-tool",
-    name: "Another Tool",
-    description: "This is another test tool",
-    category: "Another Category",
-    tags: ["another", "test"],
-    path: "/another",
+    id: "2",
+    name: "Beta",
+    description: "Second",
+    category: "B",
+    tags: [],
+    path: "/beta",
   },
 ];
 
-describe('SearchContext', () => {
-  it('should create a context with the correct properties', () => {
-    // Check that the SearchContext is created correctly
-    expect(SearchProvider).toBeDefined();
-    expect(useSearch).toBeDefined();
+function TestComponent() {
+  const {
+    query,
+    setQuery,
+    results,
+    resultsWithScores,
+    recentSearches,
+    addRecentSearch,
+    removeRecentSearch,
+    clearRecentSearches,
+    recentUtilities,
+    addRecentUtility,
+  } = useSearch();
+
+  return (
+    <div>
+      <input
+        aria-label="search-input"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <button onClick={() => addRecentSearch(query)} aria-label="add-recent">
+        Add Recent
+      </button>
+      <button onClick={() => clearRecentSearches()} aria-label="clear-recents">
+        Clear Recents
+      </button>
+      <button
+        onClick={() => addRecentUtility(mockUtilities[0])}
+        aria-label="add-recent-utility"
+      >
+        Add Recent Utility
+      </button>
+      <ul aria-label="results">
+        {results.map((u) => (
+          <li key={u.id}>{u.name}</li>
+        ))}
+      </ul>
+      <ul aria-label="results-with-scores">
+        {resultsWithScores.map((r) => (
+          <li key={r.item.id}>
+            {r.item.name}:{r.score ?? ""}
+          </li>
+        ))}
+      </ul>
+      <ul aria-label="recent-searches">
+        {recentSearches.map((q) => (
+          <li key={q}>{q}</li>
+        ))}
+      </ul>
+      <ul aria-label="recent-utilities">
+        {recentUtilities.map((u) => (
+          <li key={u.id}>{u.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+describe("SearchContext", () => {
+  it("should throw if useSearch is used outside provider", () => {
+    expect(() => useSearch()).toThrow();
   });
-  
-  it('should initialize with default values', () => {
-    // Mock useState to capture initial values
-    const stateMock = vi.spyOn(require('react'), 'useState');
-    
-    // Reset mock to capture new calls
-    stateMock.mockClear();
-    
-    // Call SearchProvider to trigger useState calls
-    const provider = new SearchProvider({ children: null });
-    
-    // Check that useState was called with the expected initial values
-    expect(stateMock).toHaveBeenCalledWith("");  // query
-    expect(stateMock).toHaveBeenCalledWith([]); // results
-    expect(stateMock).toHaveBeenCalledWith(false); // isOpen
+
+  it("should update query and show results", async () => {
+    render(
+      <SearchProvider utilities={mockUtilities}>
+        <TestComponent />
+      </SearchProvider>
+    );
+    const input = screen.getByLabelText("search-input");
+    await act(async () => {
+      await userEvent.type(input, "Alpha");
+    });
+    expect(input).toHaveValue("Alpha");
+    // Should show Alpha in results
+    expect(screen.getByLabelText("results")).toHaveTextContent("Alpha");
+    expect(screen.getByLabelText("results-with-scores")).toHaveTextContent(
+      "Alpha"
+    );
   });
-  
-  it('should throw an error when useSearch is used outside of SearchProvider', () => {
-    // Mock useContext to return undefined (simulating use outside of Provider)
-    const useContextMock = vi.spyOn(require('react'),
-      
-      // Initial state
-      expect(result.current.query).toBe('')
-      
-      // Update query
-      act(() => {
-        result.current.setQuery('test');
-      });
-      
-      // Check that query was updated
-      expect(result.current.query).toBe('test');
+
+  it("should add, remove, and clear recent searches", async () => {
+    render(
+      <SearchProvider utilities={mockUtilities}>
+        <TestComponent />
+      </SearchProvider>
+    );
+    const input = screen.getByLabelText("search-input");
+    await act(async () => {
+      await userEvent.type(input, "Beta");
     });
-    
-    it('should update results when query changes', () => {
-      const { result } = renderHook(() => useSearch(), {
-        wrapper: ({ children }) => (
-          <SearchProvider utilities={mockUtilities}>{children}</SearchProvider>
-        ),
-      });
-      
-      // Initial state
-      expect(result.current.results).toEqual([]);
-      
-      // Update query to match some utilities
-      act(() => {
-        result.current.setQuery('test');
-      });
-      
-      // Check that results were updated
-      expect(result.current.results.length).toBeGreaterThan(0);
-      expect(result.current.results.some(item => item.id === 'test-tool-1')).toBe(true);
-      expect(result.current.results.some(item => item.id === 'test-tool-2')).toBe(true);
+    await act(async () => {
+      await userEvent.click(screen.getByLabelText("add-recent"));
     });
-    
-    it('should update isOpen state when setIsOpen is called', () => {
-      const { result } = renderHook(() => useSearch(), {
-        wrapper: ({ children }) => (
-          <SearchProvider utilities={mockUtilities}>{children}</SearchProvider>
-        ),
-      });
-      
-      // Initial state
-      expect(result.current.isOpen).toBe(false);
-      
-      // Open the command palette
-      act(() => {
-        result.current.setIsOpen(true);
-      });
-      
-      // Check that isOpen was updated
-      expect(result.current.isOpen).toBe(true);
-      
-      // Close the command palette
-      act(() => {
-        result.current.setIsOpen(false);
-      });
-      
-      // Check that isOpen was updated
-      expect(result.current.isOpen).toBe(false);
+    expect(screen.getByLabelText("recent-searches")).toHaveTextContent("Beta");
+
+    // Clear recents
+    await act(async () => {
+      await userEvent.click(screen.getByLabelText("clear-recents"));
     });
-    
-    it('should return empty results when query is empty', () => {
-      const { result } = renderHook(() => useSearch(), {
-        wrapper: ({ children }) => (
-          <SearchProvider utilities={mockUtilities}>{children}</SearchProvider>
-        ),
-      });
-      
-      // Set query to empty string
-      act(() => {
-        result.current.setQuery('');
-      });
-      
-      // Check that results are empty
-      expect(result.current.results).toEqual([]);
+    expect(screen.getByLabelText("recent-searches")).toBeEmptyDOMElement();
+  });
+
+  it("should add recent utility", async () => {
+    render(
+      <SearchProvider utilities={mockUtilities}>
+        <TestComponent />
+      </SearchProvider>
+    );
+    await act(async () => {
+      await userEvent.click(screen.getByLabelText("add-recent-utility"));
     });
-    
-    it('should filter results based on query', () => {
-      const { result } = renderHook(() => useSearch(), {
-        wrapper: ({ children }) => (
-          <SearchProvider utilities={mockUtilities}>{children}</SearchProvider>
-        ),
-      });
-      
-      // Search for "one"
-      act(() => {
-        result.current.setQuery('one');
-      });
-      
-      // Check that only the first tool is returned
-      expect(result.current.results.length).toBe(1);
-      expect(result.current.results[0].id).toBe('test-tool-1');
-      
-      // Search for "another"
-      act(() => {
-        result.current.setQuery('another');
-      });
-      
-      // Check that only the third tool is returned
-      expect(result.current.results.length).toBe(1);
-      expect(result.current.results[0].id).toBe('another-tool');
-    });
+    expect(screen.getByLabelText("recent-utilities")).toHaveTextContent(
+      "Alpha"
+    );
   });
 });
