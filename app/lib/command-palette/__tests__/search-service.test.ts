@@ -37,10 +37,14 @@ describe("SearchService", () => {
     expect(results).toEqual([]);
   });
 
-  it("should return empty results for short query", () => {
+  it("should return results for single character query", () => {
     const searchService = new SearchService(mockUtilities);
     const results = searchService.search("a");
-    expect(results).toEqual([]);
+    expect(results.length).toBeGreaterThan(0);
+    // Should find "Another Tool" which contains "a"
+    expect(results.some((result) => result.name.includes("Another"))).toBe(
+      true
+    );
   });
 
   it("should find exact matches", () => {

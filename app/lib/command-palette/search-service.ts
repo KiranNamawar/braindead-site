@@ -30,7 +30,7 @@ const DEFAULT_SEARCH_OPTIONS: SearchOptions = {
   threshold: 0.3,
   includeScore: true,
   shouldSort: true,
-  minMatchCharLength: 2,
+  minMatchCharLength: 1, // Allow single character searches
 };
 
 /**
