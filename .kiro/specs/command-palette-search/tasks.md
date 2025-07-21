@@ -71,7 +71,7 @@
     - Commit changes with descriptive message
     - _Requirements: 1.3, 1.5, 6.3_
 
-- [ ] 4. Implement search results display
+- [x] 4. Implement search results display
 
   - [x] 4.1 Create categorized results grouping
 
@@ -107,7 +107,7 @@
     - Commit changes with descriptive message
     - _Requirements: 3.1, 3.2_
 
-- [ ] 5. Implement navigation and selection
+- [x] 5. Implement navigation and selection
 
   - [x] 5.1 Add navigation functionality
 
@@ -117,7 +117,16 @@
     - Test navigation to selected tools
     - Commit changes with descriptive message
     - _Requirements: 3.3, 4.3_
-  
+
+  - [x] 5.2 Implement category expansion/collapse
+
+    - Add collapsible category headers with visual indicators
+    - Implement keyboard support for category toggling (Enter/Space)
+    - Add wrap-around navigation (down on last item goes to first)
+    - Ensure proper accessibility with ARIA attributes
+    - Test category expansion/collapse functionality
+    - Commit changes with descriptive message
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
 - [ ] 6. Enhance accessibility
 

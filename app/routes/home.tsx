@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import { ThemeToggle } from "~/components/theme-toggle";
+import { SearchButton } from "~/components/command-palette/SearchButton";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -15,6 +16,11 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">BrainDead</h1>
           <div className="flex items-center gap-4">
+            {/* Mobile search button */}
+            <div className="sm:hidden">
+              <SearchButton />
+            </div>
+            {/* Desktop keyboard shortcut hint */}
             <div className="hidden sm:block">
               <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                 <span className="text-xs">⌘</span>K
