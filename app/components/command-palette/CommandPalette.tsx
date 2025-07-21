@@ -10,6 +10,7 @@ import {
   CommandSeparator,
 } from "~/components/ui/command";
 import { useSearch } from "~/lib/command-palette/search-context";
+import { useKeyboardShortcuts } from "./KeyboardShortcuts";
 import type { Utility } from "~/lib/types";
 import type { SearchResult } from "~/lib/command-palette/search-service";
 
@@ -44,6 +45,12 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       setIsOpen(newOpen);
     }
   };
+
+  // Setup keyboard shortcuts
+  useKeyboardShortcuts({
+    isOpen: paletteOpen,
+    onToggle: handleOpenChange,
+  });
 
   // Clear query when palette closes
   useEffect(() => {
