@@ -52,7 +52,7 @@ function CommandDialog({
       </DialogHeader>
       <DialogContent
         className={cn(
-          "overflow-hidden p-0",
+          "overflow-hidden p-0 command-dialog-content",
           // Mobile optimizations
           "h-[85vh] max-h-[640px] w-[95vw] max-w-[640px]",
           // On mobile, position slightly higher and make fullscreen-like
@@ -168,7 +168,7 @@ function CommandItem({
         // Better touch targets on mobile
         "py-3 sm:py-1.5 min-h-[44px] sm:min-h-[auto]",
         // Improve touch feedback
-        "active:bg-accent/80 transition-colors",
+        "active:bg-accent/80 command-item",
         className
       )}
       {...props}

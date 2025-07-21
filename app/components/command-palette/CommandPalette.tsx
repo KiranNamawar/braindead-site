@@ -15,6 +15,7 @@ import { useKeyboardShortcuts } from "./KeyboardShortcuts";
 import { highlightMatches } from "~/lib/command-palette/highlight-matches";
 import type { Utility } from "~/lib/types";
 import type { SearchResult } from "~/lib/command-palette/search-service";
+import "./command-palette.css";
 
 interface CommandPaletteProps {
   /** Whether the command palette is open */
@@ -31,6 +32,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
     new Set()
   );
+  const liveRegionRef = useRef<HTMLDivElement>(null);
+  const [announceText, setAnnounceText] = useState<string>("");
 
   const {
     query,
@@ -143,6 +146,41 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const showRecentItems = !query.trim();
   const recentItems = showRecentItems ? recentUtilities.slice(0, 5) : [];
   const recentSearchItems = showRecentItems ? recentSearches.slice(0, 3) : [];
+
+  // Live region announcements for screen readers
+  useEffect(() => {
+    if (!paletteOpen) return;
+
+    let announcement = "";
+    const totalResults = resultsWithScores.length;
+
+    if (query.trim()) {
+      if (totalResults === 0) {
+        announcement = "No tools found";
+      } else if (totalResults === 1) {
+        announcement = "1 tool found";
+      } else {
+        announcement = `${totalResults} tools found`;
+      }
+    } else if (recentItems.length > 0 || recentSearchItems.length > 0) {
+      announcement = "Recent tools and searches loaded";
+    } else {
+      announcement = "Command palette opened";
+    }
+
+    // Debounce announcements to avoid overwhelming screen readers
+    const timeoutId = setTimeout(() => {
+      setAnnounceText(announcement);
+    }, 150);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    paletteOpen,
+    query,
+    resultsWithScores.length,
+    recentItems.length,
+    recentSearchItems.length,
+  ]);
 
   // Create a flattened list of all selectable items for keyboard navigation
   const getAllSelectableItems = useCallback(() => {
@@ -267,12 +305,25 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       description="Search for tools and utilities"
       loop={true}
     >
+      {/* Screen reader live region for announcements */}
+      <div
+        ref={liveRegionRef}
+        className="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        role="status"
+      >
+        {announceText}
+      </div>
+
       <div className="relative">
         <CommandInput
           ref={inputRef}
           placeholder="Search for tools and utilities..."
           value={query}
           onValueChange={setQuery}
+          aria-label="Search for tools and utilities"
+          aria-describedby="search-help"
         />
         {/* Mobile close button */}
         <button
@@ -283,7 +334,12 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           <XIcon className="h-5 w-5" />
         </button>
       </div>
-      <CommandList>
+
+      {/* Hidden search help text */}
+      <div id="search-help" className="sr-only">
+        Use arrow keys to navigate results, Enter to select, Escape to close
+      </div>
+      <CommandList role="listbox" aria-label="Search results">
         {showRecentItems && recentItems.length > 0 && (
           <>
             <CommandGroup heading="Recent Tools">
@@ -367,7 +423,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
                 {/* Custom collapsible category header */}
                 <div
-                  className={`flex items-center justify-between px-2 text-sm font-medium text-muted-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors ${
+                  className={`flex items-center justify-between px-2 text-sm font-medium text-muted-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground command-category-header ${
                     isCategorySelected ? "bg-accent text-accent-foreground" : ""
                   }
                   py-3 sm:py-1 min-h-[44px] sm:min-h-[auto] active:bg-accent/80`}

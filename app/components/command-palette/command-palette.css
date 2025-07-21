@@ -1,0 +1,39 @@
+/* Reduced motion support for command palette */
+@media (prefers-reduced-motion: reduce) {
+  .command-dialog-content {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .command-dialog-overlay {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .command-item {
+    transition: none !important;
+  }
+
+  .command-category-header {
+    transition: none !important;
+  }
+
+  /* Remove scale animations for reduced motion */
+  [data-state="open"]:where(.command-dialog-content) {
+    animation: none !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  [data-state="closed"]:where(.command-dialog-content) {
+    animation: none !important;
+  }
+
+  /* Remove fade animations */
+  [data-state="open"]:where(.command-dialog-overlay) {
+    animation: none !important;
+  }
+
+  [data-state="closed"]:where(.command-dialog-overlay) {
+    animation: none !important;
+  }
+}
