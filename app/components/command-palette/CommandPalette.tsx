@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import {
   CommandDialog,
@@ -23,6 +23,7 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
   const {
     query,
     setQuery,
@@ -58,6 +59,18 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       setQuery("");
     }
   }, [paletteOpen, setQuery]);
+
+  // Focus management - focus the input when palette opens
+  useEffect(() => {
+    if (paletteOpen && inputRef.current) {
+      // Small delay to ensure the dialog is fully rendered
+      const timeoutId = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [paletteOpen]);
 
   // Handle utility selection
   const handleSelect = (utility: Utility) => {
@@ -102,6 +115,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       description="Search for tools and utilities"
     >
       <CommandInput
+        ref={inputRef}
         placeholder="Search for tools and utilities..."
         value={query}
         onValueChange={setQuery}

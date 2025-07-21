@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router";
 import { CommandPalette } from "../CommandPalette";
@@ -57,5 +57,25 @@ describe("CommandPalette", () => {
     expect(
       screen.getByPlaceholderText("Search for tools and utilities...")
     ).toBeInTheDocument();
+  });
+
+  it("focuses the search input when opened", async () => {
+    render(
+      <TestWrapper>
+        <CommandPalette open={true} />
+      </TestWrapper>
+    );
+
+    const input = screen.getByPlaceholderText(
+      "Search for tools and utilities..."
+    );
+
+    // Wait for focus to be set
+    await waitFor(
+      () => {
+        expect(input).toHaveFocus();
+      },
+      { timeout: 100 }
+    );
   });
 });
