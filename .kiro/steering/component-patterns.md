@@ -5,10 +5,10 @@
 ### Installation & Setup
 ```bash
 # Add a component
-bunx shadcn-ui@latest add button
+bunx shadcn@latest add button
 
 # Add multiple components
-bunx shadcn-ui@latest add button card form input
+bunx shadcn@latest add button card form input
 ```
 
 ### Component Categories
