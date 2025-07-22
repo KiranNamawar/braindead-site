@@ -1,17 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { TextInput } from '../TextInput';
 
 describe('TextInput Component', () => {
-  // Mock timer for debounce testing
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('renders correctly with initial value', () => {
     const initialValue = 'Initial text';
     render(<TextInput value={initialValue} onChange={() => {}} />);
@@ -28,39 +19,17 @@ describe('TextInput Component', () => {
     expect(textarea).toHaveAttribute('placeholder', expect.stringContaining('Type or paste your text here'));
   });
 
-  it('updates local value immediately when typing', () => {
-    render(<TextInput value="" onChange={() => {}} />);
-    
-    const textarea = screen.getByTestId('text-input');
-    fireEvent.change(textarea, { target: { value: 'New text' } });
-    
-    expect(textarea).toHaveValue('New text');
-  });
-
-  it('debounces the onChange callback', () => {
+  it('updates local value and calls onChange immediately when typing', () => {
     const handleChange = vi.fn();
-    render(<TextInput value="" onChange={handleChange} debounceTime={500} />);
+    render(<TextInput value="" onChange={handleChange} />);
     
     const textarea = screen.getByTestId('text-input');
     fireEvent.change(textarea, { target: { value: 'New text' } });
     
-    // The callback should not be called immediately
-    expect(handleChange).not.toHaveBeenCalled();
+    // The textarea value should update immediately
+    expect(textarea).toHaveValue('New text');
     
-    // Fast-forward time by 300ms
-    act(() => {
-      vi.advanceTimersByTime(300);
-    });
-    
-    // The callback should still not be called
-    expect(handleChange).not.toHaveBeenCalled();
-    
-    // Fast-forward time to 500ms
-    act(() => {
-      vi.advanceTimersByTime(200);
-    });
-    
-    // Now the callback should be called
+    // The onChange callback should be called immediately
     expect(handleChange).toHaveBeenCalledWith('New text');
     expect(handleChange).toHaveBeenCalledTimes(1);
   });
@@ -78,41 +47,25 @@ describe('TextInput Component', () => {
     expect(textarea).toHaveValue('Updated');
   });
 
-  it('handles multiple rapid changes correctly', () => {
+  it('handles multiple changes correctly', () => {
     const handleChange = vi.fn();
-    render(<TextInput value="" onChange={handleChange} debounceTime={500} />);
+    render(<TextInput value="" onChange={handleChange} />);
     
     const textarea = screen.getByTestId('text-input');
     
     // Type "Hello"
     fireEvent.change(textarea, { target: { value: 'Hello' } });
-    
-    // Wait 200ms
-    act(() => {
-      vi.advanceTimersByTime(200);
-    });
+    expect(handleChange).toHaveBeenCalledWith('Hello');
     
     // Type "Hello world"
     fireEvent.change(textarea, { target: { value: 'Hello world' } });
-    
-    // Wait 200ms
-    act(() => {
-      vi.advanceTimersByTime(200);
-    });
+    expect(handleChange).toHaveBeenCalledWith('Hello world');
     
     // Type "Hello world!"
     fireEvent.change(textarea, { target: { value: 'Hello world!' } });
-    
-    // The callback should not have been called yet
-    expect(handleChange).not.toHaveBeenCalled();
-    
-    // Fast-forward time to 500ms after the last change
-    act(() => {
-      vi.advanceTimersByTime(500);
-    });
-    
-    // Now the callback should be called with the final value
     expect(handleChange).toHaveBeenCalledWith('Hello world!');
-    expect(handleChange).toHaveBeenCalledTimes(1);
+    
+    // The callback should have been called once for each change
+    expect(handleChange).toHaveBeenCalledTimes(3);
   });
 });

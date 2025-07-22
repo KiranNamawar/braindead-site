@@ -1,48 +1,28 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
 
 interface TextInputProps {
   value: string;
   onChange: (value: string) => void;
-  debounceTime?: number;
 }
 
 /**
- * Text input component for the case converter with debounced input handling
+ * Text input component for the case converter with real-time input handling
  */
-export function TextInput({ value, onChange, debounceTime = 300 }: TextInputProps) {
+export function TextInput({ value, onChange }: TextInputProps) {
   const [localValue, setLocalValue] = useState(value);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Update local value when prop value changes
   useEffect(() => {
     setLocalValue(value);
   }, [value]);
 
-  // Clean up timer on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
-
-  // Handle input changes with debouncing
+  // Handle input changes in real-time
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setLocalValue(newValue);
-    
-    // Clear any existing timer
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-    
-    // Set a new timer
-    timerRef.current = setTimeout(() => {
-      onChange(newValue);
-    }, debounceTime);
+    onChange(newValue);
   };
 
   return (
