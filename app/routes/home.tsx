@@ -1,6 +1,7 @@
 import type { Route } from "./+types/home";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { SearchButton } from "~/components/command-palette/SearchButton";
+import { TextCaseConverter } from "~/components/tools/text-case-converter/TextCaseConverter";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -35,19 +36,21 @@ export default function Home() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-4">Welcome to BrainDead!</h2>
-          <p className="text-lg text-muted-foreground mb-4">
-            Your collection of simple, everyday web utilities.
-          </p>
-          <p className="text-sm text-muted-foreground mb-8">
-            Press{" "}
-            <kbd className="px-2 py-1 bg-muted rounded text-xs">Cmd+K</kbd> or{" "}
-            <kbd className="px-2 py-1 bg-muted rounded text-xs">/</kbd> to open
-            the command palette and search for tools!
-          </p>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-bold mb-4">Welcome to BrainDead!</h2>
+            <p className="text-lg text-muted-foreground mb-4">
+              Your collection of simple, everyday web utilities.
+            </p>
+            <p className="text-sm text-muted-foreground mb-8">
+              Press{" "}
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">Cmd+K</kbd> or{" "}
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">/</kbd> to open
+              the command palette and search for tools!
+            </p>
+          </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3 mb-12">
             <div className="p-6 border rounded-lg bg-card">
               <h3 className="font-semibold mb-2">Text Tools</h3>
               <p className="text-sm text-muted-foreground">
@@ -68,6 +71,15 @@ export default function Home() {
                 Resize, convert, and optimize images
               </p>
             </div>
+          </div>
+
+          {/* Text Case Converter Demo */}
+          <div className="border rounded-lg p-6 bg-card">
+            <h2 className="text-2xl font-bold mb-4">Text Case Converter</h2>
+            <p className="text-muted-foreground mb-6">
+              Convert text between different case formats with advanced options.
+            </p>
+            <TextCaseConverter />
           </div>
         </div>
       </main>

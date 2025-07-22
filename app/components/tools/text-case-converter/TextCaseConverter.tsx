@@ -3,7 +3,7 @@ import { TextInput } from "./TextInput";
 import { CaseFormatSelector } from "./CaseFormatSelector";
 import { TextOutput } from "./TextOutput";
 import { OptionsPanel } from "./OptionsPanel";
-import { CaseFormat, ConversionOptionsState, DEFAULT_OPTIONS } from "./types";
+import { CaseFormat, type ConversionOptionsState, DEFAULT_OPTIONS } from "./types";
 import { convertCase } from "./case-converter";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";

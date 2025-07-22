@@ -1,4 +1,5 @@
-import { CaseFormat, ConversionOptions } from "./types";
+import { CaseFormat } from "./types";
+import type { ConversionOptions } from "./types";
 
 /**
  * Convert text to uppercase
