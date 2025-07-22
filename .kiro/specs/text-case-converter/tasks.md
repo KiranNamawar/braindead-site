@@ -82,23 +82,7 @@
 
 - [x] 5. Enhance accessibility
 
-
-
-
-
-
-
-
-
   - [x] 5.1 Implement keyboard navigation
-
-
-
-
-
-
-
-
 
     - Add proper tab order for all interactive elements
     - Implement keyboard shortcuts for common actions
@@ -107,8 +91,6 @@
 
   - [x] 5.2 Add screen reader support
 
-
-
     - Add appropriate ARIA labels and descriptions
     - Implement live regions for dynamic content
     - Test with screen readers
@@ -116,17 +98,12 @@
 
   - [x] 5.3 Implement reduced motion support
 
-
-
-
     - Add media query for prefers-reduced-motion
     - Adjust animations based on user preference
     - Test with reduced motion settings
     - _Requirements: 5.3_
 
   - [x] 5.4 Ensure color contrast and text sizing
-
-
 
     - Verify color contrast meets WCAG standards
     - Test with different text sizes
