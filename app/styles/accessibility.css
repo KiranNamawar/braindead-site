@@ -1,0 +1,82 @@
+/**
+ * Accessibility styles for color contrast and text sizing
+ */
+
+/* Ensure minimum contrast ratios */
+:root {
+  /* Ensure text colors have sufficient contrast with backgrounds */
+  --min-text-contrast: 4.5; /* WCAG AA standard for normal text */
+  --min-large-text-contrast: 3; /* WCAG AA standard for large text */
+}
+
+/* Support for high contrast mode */
+@media (forced-colors: active) {
+  /* Use system colors in high contrast mode */
+  :root {
+    --background: Canvas;
+    --foreground: CanvasText;
+    --primary: Highlight;
+    --primary-foreground: HighlightText;
+    --secondary: Canvas;
+    --secondary-foreground: CanvasText;
+    --muted: Canvas;
+    --muted-foreground: GrayText;
+    --accent: Highlight;
+    --accent-foreground: HighlightText;
+    --border: CanvasText;
+  }
+
+  /* Ensure buttons have visible borders in high contrast mode */
+  .button, button, [role="button"] {
+    border: 1px solid CanvasText;
+  }
+
+  /* Ensure focus indicators are visible */
+  *:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+}
+
+/* Support for text resizing */
+html {
+  /* Allow text to be resized up to 200% without breaking layout */
+  font-size: 100%; /* Base font size */
+}
+
+/* Responsive text sizing */
+@media (max-width: 640px) {
+  html {
+    font-size: 95%; /* Slightly smaller on small screens */
+  }
+}
+
+/* Support for users who have set larger default fonts */
+body {
+  font-size: 1rem; /* Use relative units */
+  line-height: 1.5; /* Ensure adequate line height */
+}
+
+/* Ensure text containers can expand with larger text */
+.text-container {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Ensure form controls scale with text size */
+input, textarea, select, button {
+  font-size: 1rem; /* Use relative units */
+}
+
+/* Ensure adequate spacing between interactive elements for larger text */
+.interactive-element {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+}
+
+/* Ensure focus indicators scale with text size */
+*:focus-visible {
+  outline-width: 0.15rem; /* Use relative units */
+  outline-offset: 0.15rem;
+}
